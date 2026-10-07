@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Networx</title>
+<!-- Networx demo deck. Same deck platform as the Jackie pitch: arrows/space = nav, F = fullscreen, O = menu. R = run the live demo. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5FA; --card:#FFFFFF; --ink:#0B1020; --muted:#5B6580; --faint:#8D96AE;
+  --line:rgba(11,16,32,.09); --accent:#002FA7; --accent-soft:rgba(0,47,167,.08); --ok:#0E7A4B;
+  --sans:Inter,system-ui,sans-serif; --head:Sora,Inter,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0A0E1A;--card:#111729;--ink:#EEF1FA;--muted:#9AA5C2;--faint:#6B7694;--line:rgba(238,241,250,.10);--accent:#6C8BFF;--accent-soft:rgba(108,139,255,.12);--ok:#3FCB8B}
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+#deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:6vh 7vw;overflow:hidden}
+.slide.active{display:flex;animation:rise .2s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.kicker{font:500 clamp(.75rem,1vw,.9rem) var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1.4rem}
+h1{font:700 clamp(3rem,9vw,8rem)/.95 var(--head);letter-spacing:-.04em}
+h1 i{font-style:normal;color:var(--accent)}
+h2{font:600 clamp(1.8rem,4vw,3.4rem)/1.08 var(--head);letter-spacing:-.025em;max-width:22ch}
+.lede{font-size:clamp(1.1rem,1.9vw,1.6rem);color:var(--muted);max-width:44ch;margin-top:1.6rem;line-height:1.45}
+.big{font:600 clamp(1.4rem,2.6vw,2.3rem)/1.2 var(--head);letter-spacing:-.02em;max-width:26ch;margin-top:1.2rem}
+
+/* title */
+.title .tag{margin-top:2rem;font:600 clamp(1.3rem,2.8vw,2.4rem)/1.2 var(--head);letter-spacing:-.02em;max-width:24ch}
+.title .rule{width:64px;height:4px;background:var(--accent);border-radius:2px;margin:2rem 0 0}
+
+/* live */
+.live{padding:3vh 3vw}
+.frame{flex:1;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 20px 50px rgba(11,16,32,.10)}
+.frame iframe{width:100%;height:100%;border:0;display:block}
+.hint{margin-top:10px;text-align:center;font:400 12px var(--mono);color:var(--faint)}
+
+/* plug in */
+.flow{display:grid;grid-template-columns:1fr auto 1.15fr auto 1fr;gap:clamp(.8rem,2vw,2rem);align-items:center;margin-top:3vh;width:100%}
+.col h3{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+.pill{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:8px;font:500 clamp(.9rem,1.3vw,1.1rem) var(--sans)}
+.pill small{font:400 11px var(--mono);color:var(--faint);white-space:nowrap}
+.pill.on small{color:var(--ok)}
+.arrow{font:400 2rem var(--head);color:var(--faint)}
+.core{background:var(--accent);color:#fff;border-radius:20px;padding:clamp(1.2rem,2.4vw,2.2rem)}
+.core b{font:700 clamp(1.5rem,2.6vw,2.4rem) var(--head);letter-spacing:-.02em;display:block;margin-bottom:.8rem}
+.core div{font-size:clamp(.9rem,1.25vw,1.1rem);line-height:1.5;padding:7px 0;border-top:1px solid rgba(255,255,255,.22)}
+.core div:first-of-type{border-top:0}
+.code{margin-top:3vh;background:#0B1020;color:#DCE4FF;border-radius:14px;padding:14px 18px;font:400 clamp(.78rem,1.15vw,1rem)/1.6 var(--mono);overflow:hidden;white-space:pre}
+.code span{color:#8FA8FF}
+
+/* every event */
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1rem,2vw,2rem);margin-top:4vh}
+.three div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.5rem}
+.three b{display:block;font:600 clamp(1.1rem,1.8vw,1.5rem) var(--head);margin-bottom:.4rem;letter-spacing:-.01em}
+.three span{color:var(--muted);font-size:clamp(.9rem,1.2vw,1.05rem)}
+
+/* clone */
+.clone{display:grid;grid-template-columns:1.2fr .8fr;gap:5vw;align-items:center}
+.qr{background:#fff;border-radius:20px;padding:18px;box-shadow:0 20px 50px rgba(11,16,32,.12);justify-self:center}
+.qr img{display:block;width:min(34vh,28vw);height:auto}
+.steps{margin-top:2rem;display:grid;gap:10px}
+.steps div{display:flex;gap:14px;align-items:baseline;font-size:clamp(1rem,1.6vw,1.35rem)}
+.steps b{font:500 .85em var(--mono);color:var(--accent);min-width:2ch}
+.url{font:500 clamp(1rem,1.6vw,1.4rem) var(--mono);color:var(--accent);margin-top:1.6rem}
+
+/* chrome */
+#bar{position:fixed;left:0;top:0;height:3px;background:var(--accent);width:0;transition:width .2s;z-index:9}
+#counter{position:fixed;right:22px;bottom:14px;font:400 12px var(--mono);color:var(--faint);z-index:9}
+#ov{position:fixed;inset:0;background:rgba(11,16,32,.55);display:none;z-index:20;align-items:center;justify-content:center}
+#ov.open{display:flex}
+#ovgrid{background:var(--card);border-radius:16px;padding:20px;display:grid;gap:6px;min-width:300px}
+.ovitem{display:flex;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:15px}
+.ovitem:hover{background:var(--accent-soft)} .ovitem b{font:500 12px var(--mono);color:var(--accent)}
+@media (max-width:800px){.flow{grid-template-columns:1fr}.arrow{display:none}.clone{grid-template-columns:1fr}.three{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="bar"></div><div id="counter"></div>
+<div id="deck">
+
+  <!-- 1 -->
+  <section class="slide title">
+    <div class="kicker">Build an Agent · Agent37 · Tech Week</div>
+    <h1>Networ<i>x</i></h1>
+    <div class="tag">Make the most of every event.</div>
+    <p class="lede">An agent that hears the promises you make while you network, and has every follow-up ready before you leave the room.</p>
+    <div class="rule"></div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide live">
+    <div class="frame"><iframe id="agent" src="/agent" title="Networx live agent"></iframe></div>
+    <div class="hint">Live. A scripted sample conversation, real Agent37 box, real Supabase rows, real Telegram. Press R to run it.</div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide">
+    <div class="kicker">Plug it into how you already work</div>
+    <h2>Any device in. Any chat app out.</h2>
+    <div class="flow">
+      <div class="col">
+        <h3>Listens through</h3>
+        <div class="pill on">Bee wristband <small>live today</small></div>
+        <div class="pill">Plaud <small>one POST</small></div>
+        <div class="pill">Pocket <small>one POST</small></div>
+        <div class="pill">Omi <small>one POST</small></div>
+        <div class="pill">Phone web page <small>no device</small></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="core">
+        <b>Networx</b>
+        <div>Catches who you met and what you promised</div>
+        <div>Agent37 box does the work and writes the draft</div>
+        <div>Supabase remembers every person and promise</div>
+        <div>A timer re-checks and sends one recap</div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="col">
+        <h3>Tells you on</h3>
+        <div class="pill on">Telegram <small>live today</small></div>
+        <div class="pill">WhatsApp <small>adapter ready</small></div>
+      </div>
+    </div>
+    <div class="code"><span>curl</span> -X POST https://your-networx/api/ingest -d '{"text":"I'll send you that deck on Friday","source":"plaud"}'</div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide">
+    <div class="kicker">Not just Tech Week</div>
+    <h2>Every room where you meet people.</h2>
+    <div class="three">
+      <div><b>Conferences</b><span>Twenty people met, twenty follow-ups, none forgotten.</span></div>
+      <div><b>Meetups and dinners</b><span>The "let's grab coffee" turns into a calendar hold.</span></div>
+      <div><b>Sales and fundraising</b><span>Every "send me the deck" gets sent while it is warm.</span></div>
+    </div>
+    <p class="lede">It only ever drafts. You tap send.</p>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <div class="clone">
+      <div>
+        <div class="kicker">Take it with you</div>
+        <h2>Scan, clone, plug in your device.</h2>
+        <div class="steps">
+          <div><b>1</b>Clone the repo</div>
+          <div><b>2</b>Add your Agent37, Supabase and chat keys</div>
+          <div><b>3</b>Point your wristband or phone at /api/ingest</div>
+        </div>
+        <div class="url">github.com/scalorafounder/networx</div>
+      </div>
+      <div class="qr"><img src="qr-github.png" alt="QR code to the Networx GitHub repo"></div>
+    </div>
+  </section>
+
+</div>
+<div id="ov"><div id="ovgrid"></div></div>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const bar=document.getElementById('bar'),counter=document.getElementById('counter');
+  const ov=document.getElementById('ov'),ovgrid=document.getElementById('ovgrid');
+  let i=0;const n=slides.length;const pad=x=>String(x).padStart(2,'0');
+  function show(k){
+    i=Math.max(0,Math.min(n-1,k));
+    slides.forEach((s,j)=>s.classList.toggle('active',j===i));
+    bar.style.width=((i+1)/n*100)+'%';counter.textContent=pad(i+1)+' / '+pad(n);
+    if(location.hash!=='#'+(i+1))history.replaceState(null,'','#'+(i+1));
+    if(window.__deckOnShow)try{window.__deckOnShow(i+1,n);}catch(e){}
+  }
+  function toggleFS(){
+    const d=document.documentElement;
+    if(!document.fullscreenElement){const p=d.requestFullscreen&&d.requestFullscreen({navigationUI:'hide'});if(p&&p.catch)p.catch(()=>{});}
+    else{document.exitFullscreen&&document.exitFullscreen();}
+  }
+  const next=()=>show(i+1),prev=()=>show(i-1);
+  window.__deck={next,prev,show,n};
+  function runDemo(){ fetch('/api/run',{method:'POST'}).catch(()=>{}); show(1); }
+  document.addEventListener('keydown',e=>{
+    if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;
+    switch(e.key){
+      case'ArrowRight':case' ':case'PageDown':next();e.preventDefault();break;
+      case'ArrowLeft':case'PageUp':prev();e.preventDefault();break;
+      case'Home':show(0);break;case'End':show(n-1);break;
+      case'f':case'F':toggleFS();break;
+      case'r':case'R':runDemo();break;
+      case'o':case'O':case'Escape':ov.classList.toggle('open');break;
+    }
+  });
+  let x0=null;
+  document.addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+  document.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50){dx<0?next():prev();}x0=null;},{passive:true});
+  const names=['Networx','Live demo','Plug it in','Every event','Clone it'];
+  slides.forEach((s,j)=>{const d=document.createElement('div');d.className='ovitem';
+    d.innerHTML='<b>'+pad(j+1)+'</b><span>'+names[j]+'</span>';
+    d.onclick=()=>{show(j);ov.classList.remove('open');};ovgrid.appendChild(d);});
+  const start=parseInt((location.hash||'').replace('#',''),10);
+  show(Number.isInteger(start)&&start>=1?start-1:0);
+})();
+</script>
+</body>
+</html>

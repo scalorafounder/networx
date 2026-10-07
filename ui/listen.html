@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--base:#F3F5FA;--panel:#fff;--ink:#0B1020;--soft:#5B6580;--accent:#002FA7;--line:rgba(11,16,32,.09)}
+@media (prefers-color-scheme:dark){:root{--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#9AA5C2;--accent:#6C8BFF;--line:rgba(238,241,250,.1)}}
+*{box-sizing:border-box;margin:0}
+body{background:var(--base);color:var(--ink);font:400 16px/1.5 Inter,system-ui,sans-serif;min-height:100vh;padding:24px 16px;display:flex;flex-direction:column;gap:16px;max-width:520px;margin:auto}
+h1{font:600 22px Sora,sans-serif}
+p{color:var(--soft);font-size:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+button{font:500 16px Inter,sans-serif;border:0;border-radius:12px;padding:14px;background:var(--accent);color:#fff;width:100%;cursor:pointer}
+button.stop{background:#B4540A}
+#live{min-height:96px;color:var(--ink);font-size:15px;white-space:pre-wrap}
+#st{font-size:13px;color:var(--soft)}
+</style>
+</head>
+<body>
+<h1>Listen on this phone</h1>
+<p>Tap start, then talk or sit near a conversation. Promises you make become drafts in your messaging app. Nothing is sent to anyone else.</p>
+<div class="card"><div id="live">Not listening.</div></div>
+<button id="b">Start listening</button>
+<div id="st"></div>
+<p>Keep this page open and the screen on. Phone browsers pause a web page when you lock the phone. For all day listening, use a Bee, Plaud, Pocket or Omi and point it at the same address: <code>POST /api/ingest</code>.</p>
+<script>
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const b = document.getElementById('b'), live = document.getElementById('live'), st = document.getElementById('st');
+let rec = null, buf = '', on = false, loc = null;
+if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => { loc = {lat: p.coords.latitude, lng: p.coords.longitude}; }, () => {}, {timeout: 8000});
+if (!SR) { b.disabled = true; live.textContent = 'This browser cannot listen. Use Chrome on Android or Safari on iPhone.'; }
+function flush(force){
+  if (buf.length < (force ? 20 : 220)) return;
+  const text = buf; buf = '';
+  fetch('/api/ingest', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text, source:'phone-web', location: loc})})
+    .then(r => st.textContent = r.ok ? 'Sent a chunk to the agent.' : 'Agent said no (' + r.status + ').')
+    .catch(() => st.textContent = 'Could not reach the agent.');
+}
+b.onclick = () => {
+  if (on) { on = false; rec.stop(); flush(true); b.textContent = 'Start listening'; b.className = ''; return; }
+  rec = new SR(); rec.continuous = true; rec.interimResults = true; rec.lang = 'en-US';
+  rec.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) { buf += t + '\n'; flush(false); } else interim += t;
+    }
+    live.textContent = (buf + interim).slice(-400);
+  };
+  rec.onend = () => { if (on) rec.start(); };
+  rec.start(); on = true; b.textContent = 'Stop and send'; b.className = 'stop';
+};
+</script>
+</body>
+</html>

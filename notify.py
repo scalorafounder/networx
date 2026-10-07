@@ -1,0 +1,50 @@
+"""Output. Pick where the agent talks to you with OUTPUT (a comma list is fine, for example OUTPUT=telegram,slack).
+
+  telegram  needs TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID      TESTED
+  whatsapp  needs TWILIO_SID, TWILIO_TOKEN, WHATSAPP_FROM, WHATSAPP_TO   written, NOT tested live
+  slack     needs SLACK_WEBHOOK_URL (incoming webhook)       written, NOT tested live
+  discord   needs DISCORD_WEBHOOK_URL (channel webhook)      written, NOT tested live
+"""
+import os
+import requests
+from common import env, telegram
+
+
+def whatsapp(text):
+    sid, tok = env("TWILIO_SID"), env("TWILIO_TOKEN")
+    r = requests.post(f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json", auth=(sid, tok),
+                      data={"From": "whatsapp:" + env("WHATSAPP_FROM"), "To": "whatsapp:" + env("WHATSAPP_TO"), "Body": text[:1500]}, timeout=20)
+    r.raise_for_status()
+    return r.json()["sid"]
+
+
+def slack(text):
+    r = requests.post(env("SLACK_WEBHOOK_URL"), json={"text": text}, timeout=20)
+    r.raise_for_status()
+    return "slack"
+
+
+def discord(text):
+    r = requests.post(env("DISCORD_WEBHOOK_URL"), json={"content": text[:1900]}, timeout=20)
+    r.raise_for_status()
+    return "discord"
+
+
+CHANNELS = {"telegram": telegram, "whatsapp": whatsapp, "slack": slack, "discord": discord}
+
+
+def send(text):
+    names = [n.strip().lower() for n in os.environ.get("OUTPUT", "telegram").split(",") if n.strip()]
+    for n in names:
+        if n not in CHANNELS:
+            raise RuntimeError(f"OUTPUT has '{n}'. Use one or more of: {', '.join(CHANNELS)}")
+    result, errors = None, []
+    for n in names:
+        try:
+            r = CHANNELS[n](text)
+            result = result or r
+        except Exception as e:
+            errors.append(f"{n}: {e}")
+    if errors and result is None:
+        raise RuntimeError("; ".join(errors))
+    return result

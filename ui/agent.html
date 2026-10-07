@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Networx</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --base:#F3F5FA; --panel:#FFFFFF; --ink:#0B1020; --soft:#5B6580; --faint:#8D96AE;
+  --line:rgba(11,16,32,.09); --accent:#002FA7; --accent-soft:rgba(0,47,167,.08);
+  --ok:#0E7A4B; --warn:#B4540A;
+  --sans:Inter,system-ui,sans-serif; --head:Sora,Inter,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#9AA5C2;--faint:#6B7694;--line:rgba(238,241,250,.10);--accent:#6C8BFF;--accent-soft:rgba(108,139,255,.12);--ok:#3FCB8B;--warn:#F0A25C}
+}
+:root[data-theme="dark"]{--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#9AA5C2;--faint:#6B7694;--line:rgba(238,241,250,.10);--accent:#6C8BFF;--accent-soft:rgba(108,139,255,.12);--ok:#3FCB8B;--warn:#F0A25C}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--base);color:var(--ink);font:400 15px/1.45 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+.app{height:100vh;display:grid;grid-template-rows:auto 1fr auto;padding:20px 24px 14px;gap:16px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:18px}
+.brand{font:600 17px var(--head);letter-spacing:-.01em}
+.brand i{font-style:normal;color:var(--accent)}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font:500 13px var(--sans);color:var(--soft)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.live .dot{background:var(--accent);animation:pulse 1.6s ease-in-out infinite}
+.done .dot{background:var(--ok)}
+.err .dot{background:var(--warn)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,47,167,.35)}50%{box-shadow:0 0 0 6px rgba(0,47,167,0)}}
+.sp{flex:1}
+.stats{display:flex;gap:26px}
+.stat{display:flex;flex-direction:column;align-items:flex-start}
+.stat b{font:600 22px var(--head);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--faint)}
+button.run{font:500 13px var(--sans);color:#fff;background:var(--accent);border:0;border-radius:10px;padding:9px 16px;cursor:pointer;transition:opacity .15s}
+button.run:hover{opacity:.9} button.run:disabled{opacity:.45;cursor:default}
+button.run:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* three panes */
+.grid{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.7fr) minmax(250px,.9fr);gap:16px;min-height:0}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.ph{padding:14px 18px 10px;display:flex;align-items:baseline;justify-content:space-between}
+.ph h2{font:600 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.ph small{font:400 12px var(--mono);color:var(--faint)}
+.body{padding:2px 18px 16px;overflow:hidden;flex:1;display:flex;flex-direction:column;gap:10px}
+
+/* hears */
+.line{font:400 13px/1.45 var(--mono);color:var(--soft);padding-left:12px;border-left:2px solid var(--line);animation:in .2s ease-out both}
+.line.hit{color:var(--ink);border-left-color:var(--accent)}
+.hears .body{justify-content:flex-end}
+.empty{color:var(--faint);font-size:14px;margin:auto;text-align:center;max-width:26ch}
+
+/* agent cards */
+.cards{overflow:auto;gap:12px}
+.card{border:1px solid var(--line);border-radius:14px;padding:14px 16px;animation:in .2s ease-out both}
+.card .who{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.av{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:600 12px var(--head)}
+.who b{font:600 14px var(--head)} .who span{font-size:12px;color:var(--faint)}
+.what{font-size:15px;color:var(--ink);margin-bottom:12px}
+.rail{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.step{font-size:12px;color:var(--faint);padding-top:8px;position:relative}
+.step::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:2px;background:var(--line);transition:background .2s}
+.step.on{color:var(--ink)} .step.on::before{background:var(--accent)}
+.step.now::before{background:linear-gradient(90deg,var(--accent),var(--accent-soft),var(--accent));background-size:200% 100%;animation:slide 1.2s linear infinite}
+@keyframes slide{from{background-position:200% 0}to{background-position:0 0}}
+.draft{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:13.5px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.draft em{font-style:normal;font:500 11px var(--mono);color:var(--accent);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em}
+.found{margin-top:8px;font-size:12.5px;color:var(--soft)}
+
+/* phone */
+.phone .body{background:var(--base);margin:0 14px 14px;border-radius:12px;padding:12px;gap:8px;overflow:auto;flex:1}
+.msg{background:var(--panel);border:1px solid var(--line);border-radius:12px 12px 12px 4px;padding:10px 12px;font-size:13px;animation:in .2s ease-out both}
+.msg b{display:block;font:500 11px var(--mono);color:var(--ok);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.msg.recap b{color:var(--accent)}
+.msg p{color:var(--ink);white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.foot{display:flex;justify-content:space-between;font-size:12.5px;color:var(--faint)}
+.foot b{color:var(--ink);font-weight:500}
+@media (max-width:900px){body{overflow:auto}.app{height:auto}.grid{grid-template-columns:1fr}.pane{min-height:240px}.stats{display:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand">Networ<i>x</i></div>
+    <div class="chip" id="chip"><span class="dot"></span><span id="phase">Idle</span></div>
+    <div class="chip" id="place" style="display:none"></div>
+    <div class="sp"></div>
+    <div class="stats">
+      <div class="stat"><b id="s-people">0</b><span>people met</span></div>
+      <div class="stat"><b id="s-prom">0</b><span>promises caught</span></div>
+      <div class="stat"><b id="s-ready">0</b><span>drafts ready</span></div>
+      <div class="stat"><b id="s-time">0:00</b><span>since it started</span></div>
+    </div>
+    <button class="run" id="run">Replay sample</button>
+  </div>
+
+  <div class="grid">
+    <section class="pane hears">
+      <div class="ph"><h2>It hears</h2><small id="src">bee</small></div>
+      <div class="body" id="hears"><div class="empty">Waiting for someone to say "I'll send you that".</div></div>
+    </section>
+
+    <section class="pane">
+      <div class="ph"><h2>It does</h2><small>agent37 box</small></div>
+      <div class="body cards" id="cards"><div class="empty">Promises show up here and get worked one by one.</div></div>
+    </section>
+
+    <section class="pane phone">
+      <div class="ph"><h2>Your phone</h2><small id="chan">telegram</small></div>
+      <div class="body" id="phone"><div class="empty">Drafts land here. You tap and send.</div></div>
+    </section>
+  </div>
+
+  <div class="foot"><span><b>Drafts only.</b> Nothing goes to anyone but you.</span><span id="recap"></span></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const API = (location.protocol === 'file:' ? 'http://localhost:8790' : '') + '/api';
+const PHASES = {idle:'Idle', listening:'Listening', catching:'Catching promises', working:'Working on them', recap:'Box timer sending recap', done:'Done', error:'Needs a look'};
+const seen = {hears:0, phone:new Set()};
+let startedAt = null, lastState = null, lastRun = undefined;
+
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+async function tick(){
+  let s;
+  try { s = await (await fetch(API + '/state')).json(); } catch(e){ return; }
+  lastState = s;
+  if (s.started !== lastRun) {          // a new run began (button, hotkey or a device): start from a clean screen
+    if (lastRun !== undefined || !s.started) { $('phone').innerHTML = ''; $('cards').innerHTML = ''; $('hears').innerHTML = ''; seen.hears = 0; seen.phone.clear(); }
+    lastRun = s.started;
+  }
+  const live = ['listening','catching','working','recap'].includes(s.phase);
+  $('chip').className = 'chip ' + (live ? 'live' : s.phase === 'done' ? 'done' : s.phase === 'error' ? 'err' : '');
+  $('phase').textContent = PHASES[s.phase] || s.phase;
+  $('place').style.display = s.place ? '' : 'none';
+  $('place').textContent = s.place || '';
+  $('run').disabled = live;
+  $('src').textContent = s.source === 'bee-replay' ? 'bee band' : (s.source || 'bee band');
+  startedAt = s.started ? s.started : null;
+
+  const ready = s.promises.filter(p => ['ready','done'].includes(p.status)).length;
+  $('s-people').textContent = s.people.length;
+  $('s-prom').textContent = s.promises.length;
+  $('s-ready').textContent = ready;
+
+  // hears
+  const heard = s.events.filter(e => e.kind === 'heard');
+  const h = $('hears');
+  if (heard.length && seen.hears === 0) h.innerHTML = '';
+  if (!heard.length && seen.hears) { h.innerHTML = '<div class="empty">Waiting for someone to say "I\'ll send you that".</div>'; seen.hears = 0; }
+  heard.slice(seen.hears).forEach(e => {
+    const d = document.createElement('div');
+    d.className = 'line' + (/connect|linkedin|intro|call|send|deck|coffee/i.test(e.text) ? ' hit' : '');
+    d.textContent = e.text; h.appendChild(d);
+    while (h.children.length > 9) h.removeChild(h.firstChild);
+  });
+  seen.hears = heard.length;
+
+  // cards
+  const kinds = {};
+  s.events.forEach(e => { if (e.promise_id) (kinds[e.promise_id] = kinds[e.promise_id] || new Set()).add(e.kind); });
+  const cards = $('cards');
+  if (!s.promises.length) { if (!cards.querySelector('.empty')) cards.innerHTML = '<div class="empty">Promises show up here and get worked one by one.</div>'; }
+  else {
+    cards.querySelector('.empty')?.remove();
+    s.promises.forEach(p => {
+      let el = document.getElementById('c' + p.id);
+      if (!el) { el = document.createElement('div'); el.className = 'card'; el.id = 'c' + p.id; cards.appendChild(el); }
+      const k = kinds[p.id] || new Set(['promise']);
+      const lvl = k.has('sent') ? 4 : k.has('draft') ? 3 : k.has('box') ? 2 : 1;
+      const names = ['Caught', 'Box working', 'Draft ready', 'On your phone'];
+      const rail = names.map((n,i) => `<div class="step ${i < lvl ? 'on' : ''} ${i === lvl - 0 && lvl < 4 ? 'now' : ''}">${n}</div>`).join('');
+      const owes = p.who_owes === 'me' ? 'you owe' : 'they owe';
+      const html = `<div class="who"><div class="av">${esc(p.person[0] || '?')}</div><b>${esc(p.person)}</b><span>${owes}</span></div>
+        <div class="what">${esc(p.what)}</div><div class="rail">${rail}</div>
+        ${p.draft ? `<div class="draft"><em>${esc(p.channel || 'draft')} draft, not sent</em>${esc(p.draft)}</div>` : ''}
+        ${p.research && lvl >= 3 ? `<div class="found">${esc(p.research)}</div>` : ''}`;
+      if (el.dataset.h !== html) { el.innerHTML = html; el.dataset.h = html; }
+    });
+  }
+
+  // phone
+  const ph = $('phone');
+  const sent = s.events.filter(e => e.kind === 'sent' && e.promise_id);
+  if (sent.length && ph.querySelector('.empty')) ph.innerHTML = '';
+  if (!sent.length && !s.recap && !ph.querySelector('.empty') && s.phase === 'idle') { ph.innerHTML = '<div class="empty">Drafts land here. You tap and send.</div>'; seen.phone.clear(); }
+  sent.forEach(e => {
+    if (seen.phone.has(e.id)) return; seen.phone.add(e.id);
+    const p = s.promises.find(x => x.id === e.promise_id) || {};
+    const d = document.createElement('div'); d.className = 'msg';
+    d.innerHTML = `<b>Ready, not sent · ${esc(e.person)}</b><p>${esc(p.draft || e.text)}</p>`;
+    ph.insertBefore(d, ph.firstChild);
+  });
+  if (s.recap && s.phase === 'done' && !ph.querySelector('.recap') && s.recap.t > (s.started || 0)) {
+    const d = document.createElement('div'); d.className = 'msg recap';
+    d.innerHTML = `<b>Recap</b><p>${esc(s.recap.text)}</p>`; ph.insertBefore(d, ph.firstChild);
+  }
+  $('recap').textContent = s.recap ? 'Last recap sent to your phone' : '';
+}
+
+function clock(){
+  if (!startedAt || !lastState) { return; }
+  const live = ['listening','catching','working','recap'].includes(lastState.phase);
+  const end = live ? Date.now()/1000 : (lastState.events.length ? lastState.events[lastState.events.length-1].t : startedAt);
+  const sec = Math.max(0, Math.round(end - startedAt));
+  $('s-time').textContent = Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0');
+}
+
+$('run').onclick = async () => {
+  $('run').disabled = true; seen.hears = 0; seen.phone.clear();
+  $('phone').innerHTML = ''; $('cards').innerHTML = ''; $('hears').innerHTML = '';
+  await fetch(API + '/run', {method:'POST'});
+};
+setInterval(tick, 700); setInterval(clock, 500); tick();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+.env
+.instance
+.cron
+__pycache__/
+*.log
+*.err
+qr-github.png

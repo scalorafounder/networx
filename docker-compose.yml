@@ -1,0 +1,9 @@
+# UNTESTED. Run:  docker compose up --build
+# Put your keys in .env first (copy .env.example).
+services:
+  networx:
+    build: .
+    env_file: .env
+    ports:
+      - "8790:8790"
+    restart: unless-stopped
