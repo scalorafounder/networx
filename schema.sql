@@ -43,3 +43,18 @@ create table if not exists event_agent.events (
   person text,
   text text
 );
+
+-- added for the phone listening page and the richer demo
+alter table event_agent.people add column if not exists role text;
+alter table event_agent.promises add column if not exists line int;      -- transcript line it came from
+alter table event_agent.promises add column if not exists kind text;     -- email, intro, calendar, other
+alter table event_agent.promises add column if not exists ask text;      -- what the other person asked for
+create table if not exists event_agent.chunks (
+  id bigserial primary key,
+  session text not null,
+  seq int,
+  text text,
+  place text,
+  created_at timestamptz default now()
+);
+create index if not exists chunks_session on event_agent.chunks(session);

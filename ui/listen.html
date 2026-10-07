@@ -2,57 +2,511 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Listen</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F3F5FA">
+<title>Networx</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--base:#F3F5FA;--panel:#fff;--ink:#0B1020;--soft:#5B6580;--accent:#002FA7;--line:rgba(11,16,32,.09)}
-@media (prefers-color-scheme:dark){:root{--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#9AA5C2;--accent:#6C8BFF;--line:rgba(238,241,250,.1)}}
-*{box-sizing:border-box;margin:0}
-body{background:var(--base);color:var(--ink);font:400 16px/1.5 Inter,system-ui,sans-serif;min-height:100vh;padding:24px 16px;display:flex;flex-direction:column;gap:16px;max-width:520px;margin:auto}
-h1{font:600 22px Sora,sans-serif}
-p{color:var(--soft);font-size:14px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
-button{font:500 16px Inter,sans-serif;border:0;border-radius:12px;padding:14px;background:var(--accent);color:#fff;width:100%;cursor:pointer}
-button.stop{background:#B4540A}
-#live{min-height:96px;color:var(--ink);font-size:15px;white-space:pre-wrap}
-#st{font-size:13px;color:var(--soft)}
+:root{
+  --base:#F3F5FA; --panel:#FFFFFF; --ink:#0B1020; --soft:#5B6580; --faint:#6F7894;
+  --line:rgba(11,16,32,.09); --accent:#002FA7; --accent-soft:rgba(0,47,167,.08); --on-accent:#fff;
+  --ok:#0E7A4B; --warn:#B4540A; --warn-soft:rgba(180,84,10,.10);
+  --sans:Inter,system-ui,sans-serif; --head:Sora,Inter,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#9AA5C2;--faint:#8590AE;--line:rgba(238,241,250,.10);--accent:#6C8BFF;--accent-soft:rgba(108,139,255,.12);--on-accent:#0A0E1A;--ok:#3FCB8B;--warn:#F0A25C;--warn-soft:rgba(240,162,92,.12)}
+}
+:root[data-theme="dark"]{--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#9AA5C2;--faint:#8590AE;--line:rgba(238,241,250,.10);--accent:#6C8BFF;--accent-soft:rgba(108,139,255,.12);--on-accent:#0A0E1A;--ok:#3FCB8B;--warn:#F0A25C;--warn-soft:rgba(240,162,92,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--base);color:var(--ink);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh}
+.wrap{max-width:480px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;gap:16px}
+.brand{font:600 20px var(--head);letter-spacing:-.01em}
+.brand i{font-style:normal;color:var(--accent)}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:32px}
+.screen{display:none;flex-direction:column;gap:16px;flex:1}
+.screen.on{display:flex;animation:in .18s ease-out both}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+h1{font:600 30px/1.15 var(--head);letter-spacing:-.025em}
+h2{font:600 24px/1.2 var(--head);letter-spacing:-.02em}
+.lead{color:var(--soft);font-size:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.label{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.steps{list-style:none;display:flex;flex-direction:column;gap:14px}
+.steps li{display:flex;gap:14px;align-items:flex-start;color:var(--ink)}
+.steps b{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:600 13px var(--head)}
+.steps span{padding-top:3px}
+.grow{flex:1}
+.btn{appearance:none;border:0;cursor:pointer;width:100%;min-height:60px;border-radius:18px;font:600 17px var(--head);letter-spacing:-.01em;background:var(--accent);color:var(--on-accent);padding:14px 20px;transition:transform .12s,opacity .12s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.98);opacity:.92}
+.btn.big{min-height:76px;font-size:20px;border-radius:22px;box-shadow:0 10px 28px -10px rgba(0,47,167,.55)}
+.btn.ghost{background:var(--panel);color:var(--accent);border:1px solid var(--line);font-weight:500}
+.btn.stop{background:var(--ink);color:var(--base)}
+.btn:focus-visible,.copy:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.btn:disabled{opacity:.5;cursor:default}
+.note{font-size:13.5px;color:var(--faint);text-align:center;padding:0 6px}
+.err{background:var(--warn-soft);color:var(--ink);border:1px solid var(--warn);border-radius:14px;padding:12px 14px;font-size:15px}
+.hidden{display:none!important}
+
+/* listening */
+.hero{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0 4px}
+.orb{position:relative;width:96px;height:96px;display:grid;place-items:center}
+.orb::before,.orb::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--accent);opacity:.14;animation:ring 2.4s ease-out infinite}
+.orb::after{animation-delay:1.2s}
+.orb i{width:34px;height:34px;border-radius:50%;background:var(--accent);display:block;animation:beat 2.4s ease-in-out infinite}
+.paused .orb::before,.paused .orb::after{background:var(--warn)}
+.paused .orb i{background:var(--warn)}
+@keyframes ring{0%{transform:scale(.45);opacity:.28}100%{transform:scale(1.15);opacity:0}}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.state{font:600 22px var(--head);letter-spacing:-.01em}
+.timer{font:500 15px var(--mono);color:var(--soft);font-variant-numeric:tabular-nums}
+.pill{display:none;font:500 13px var(--sans);padding:6px 12px;border-radius:999px;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
+.pill.on{display:inline-block}
+.pill.good{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.tx{display:flex;flex-direction:column;gap:6px;min-height:84px;justify-content:flex-end}
+.tx p{font:400 13px/1.5 var(--mono);color:var(--soft);padding-left:12px;border-left:2px solid var(--line);overflow-wrap:anywhere;animation:in .18s ease-out both}
+.tx p.live{border-left-color:var(--accent);color:var(--ink)}
+.tx .empty{border:0;padding:0;color:var(--faint);text-align:center;font-family:var(--sans);font-size:14px}
+.counts{display:flex;justify-content:space-between;gap:12px}
+.counts div{display:flex;flex-direction:column}
+.counts b{font:600 22px var(--head);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.counts span{font-size:12.5px;color:var(--faint)}
+.info{background:var(--accent-soft);border:0;font-size:14.5px;color:var(--ink)}
+.info .label{display:block;margin-bottom:6px;color:var(--accent)}
+
+/* processing */
+.proc{display:flex;flex-direction:column;gap:16px;padding-top:28px}
+.proc .step{display:flex;gap:14px;align-items:center;color:var(--faint);transition:color .18s}
+.proc .step i{flex:none;width:12px;height:12px;border-radius:50%;background:var(--line);transition:background .18s}
+.proc .step.now{color:var(--ink)}
+.proc .step.now i{background:var(--accent);animation:beat 1.4s ease-in-out infinite}
+.proc .step.done{color:var(--soft)}
+.proc .step.done i{background:var(--ok)}
+.bar{height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;width:40%;background:var(--accent);border-radius:2px;animation:slide 1.4s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+
+/* results */
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sum .card{padding:14px 16px}
+.sum b{display:block;font:600 32px var(--head);letter-spacing:-.03em;color:var(--accent);line-height:1.1}
+.sum span{font-size:13.5px;color:var(--soft)}
+.tips{list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:12px}
+.tips li{counter-increment:t;display:flex;gap:12px;font-size:15px}
+.tips li::before{content:counter(t);flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:600 12px var(--head);margin-top:1px}
+.who{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.av{flex:none;width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:600 16px var(--head)}
+.who b{display:block;font:600 16px var(--head)}
+.chan{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.what{font-size:16px;margin-bottom:12px}
+.draft{background:var(--accent-soft);border-radius:12px;padding:12px 14px;font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.draft .label{display:block;margin-bottom:6px;color:var(--accent)}
+.copy{margin-top:10px;appearance:none;cursor:pointer;min-height:48px;width:100%;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--accent);font:500 15px var(--sans);transition:background .15s}
+.copy.ok{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.res{margin-top:10px;font-size:13px;color:var(--faint)}
+.cards{display:flex;flex-direction:column;gap:14px}
+.foot{font-size:13.5px;color:var(--soft);text-align:center}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<h1>Listen on this phone</h1>
-<p>Tap start, then talk or sit near a conversation. Promises you make become drafts in your messaging app. Nothing is sent to anyone else.</p>
-<div class="card"><div id="live">Not listening.</div></div>
-<button id="b">Start listening</button>
-<div id="st"></div>
-<p>Keep this page open and the screen on. Phone browsers pause a web page when you lock the phone. For all day listening, use a Bee, Plaud, Pocket or Omi and point it at the same address: <code>POST /api/ingest</code>.</p>
+<div class="wrap">
+  <div class="top"><div class="brand" aria-label="Networx">Networ<i>x</i></div></div>
+
+  <!-- unsupported -->
+  <section class="screen" id="s-unsupported">
+    <h2>This browser cannot listen.</h2>
+    <p class="lead">This browser cannot listen. Open this link in Chrome on Android or Safari on iPhone.</p>
+  </section>
+
+  <!-- unfinished session -->
+  <section class="screen" id="s-resume">
+    <h2>Welcome back</h2>
+    <div class="card">
+      <span class="label">Unfinished session</span>
+      <p style="margin-top:6px" id="resume-text"></p>
+    </div>
+    <div class="grow"></div>
+    <button class="btn big" id="b-resume-finish">Process it now</button>
+    <button class="btn ghost" id="b-resume-keep">Keep listening</button>
+  </section>
+
+  <!-- idle -->
+  <section class="screen" id="s-idle">
+    <div style="padding-top:8px">
+      <h1>Make the most of every event.</h1>
+    </div>
+    <div class="card">
+      <ul class="steps">
+        <li><b>1</b><span>Tap start and put your phone in your pocket.</span></li>
+        <li><b>2</b><span>Keep networking. Talk to people like normal.</span></li>
+        <li><b>3</b><span>Tap stop and get your next steps, with drafts ready to send.</span></li>
+      </ul>
+    </div>
+    <div class="grow"></div>
+    <button class="btn big" id="b-start">Start listening</button>
+    <p class="note">Your phone will ask to use the microphone. Your words go to your own agent, and it only writes drafts. It never sends anything.</p>
+  </section>
+
+  <!-- listening -->
+  <section class="screen" id="s-listen">
+    <div class="hero" id="hero" aria-live="polite">
+      <div class="orb" aria-hidden="true"><i></i></div>
+      <div class="state" id="state">Listening</div>
+      <div class="timer" id="timer">0:00</div>
+      <span class="pill" id="pill" role="status"></span>
+    </div>
+    <div class="card">
+      <span class="label">What it hears</span>
+      <div class="tx" id="tx" style="margin-top:10px"><p class="empty">Say something. It shows up here.</p></div>
+    </div>
+    <div class="counts card">
+      <div><b id="c-words">0</b><span>words heard</span></div>
+      <div style="text-align:right"><b id="c-chunks">0</b><span>sent to the agent</span></div>
+    </div>
+    <div class="card info">
+      <span class="label">Good to know</span>
+      Keep this browser open. Some phones pause listening when the screen locks, iPhones most of all. If it pauses, open this page again and it picks up where it left off. Nothing you said is lost: it is saved every 20 seconds.
+    </div>
+    <div class="grow"></div>
+    <p class="note" id="sent-note">Sent to the agent: 0 chunks</p>
+    <button class="btn big stop" id="b-stop">Stop and get my next steps</button>
+  </section>
+
+  <!-- processing -->
+  <section class="screen" id="s-proc">
+    <h2>Working on it</h2>
+    <p class="lead" id="proc-lead">This can take up to a minute and a half. You can leave this page open.</p>
+    <div class="proc" id="proc" aria-live="polite">
+      <div class="step" data-i="0"><i></i><span>Reading everything you said</span></div>
+      <div class="step" data-i="1"><i></i><span>Finding the people and promises</span></div>
+      <div class="step" data-i="2"><i></i><span>Writing your follow-ups</span></div>
+    </div>
+    <div class="bar" id="bar"><span></span></div>
+    <div class="err hidden" id="proc-err" role="alert"></div>
+    <div class="grow"></div>
+    <button class="btn big hidden" id="b-retry">Try again</button>
+  </section>
+
+  <!-- results -->
+  <section class="screen" id="s-res">
+    <h2>Your next steps</h2>
+    <div class="sum">
+      <div class="card"><b id="r-people">0</b><span>people met</span></div>
+      <div class="card"><b id="r-prom">0</b><span>promises caught</span></div>
+    </div>
+    <div class="card hidden" id="tips-card"><span class="label">Tips</span><ol class="tips" id="tips" style="margin-top:12px"></ol></div>
+    <div class="cards" id="steps"></div>
+    <p class="note hidden" id="no-steps">No follow-ups this time. Try a longer session next time.</p>
+    <p class="foot">Drafts only. Nothing was sent to anyone.</p>
+    <button class="btn" id="b-new">Start a new session</button>
+  </section>
+</div>
+
 <script>
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-const b = document.getElementById('b'), live = document.getElementById('live'), st = document.getElementById('st');
-let rec = null, buf = '', on = false, loc = null;
-if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => { loc = {lat: p.coords.latitude, lng: p.coords.longitude}; }, () => {}, {timeout: 8000});
-if (!SR) { b.disabled = true; live.textContent = 'This browser cannot listen. Use Chrome on Android or Safari on iPhone.'; }
-function flush(force){
-  if (buf.length < (force ? 20 : 220)) return;
-  const text = buf; buf = '';
-  fetch('/api/ingest', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text, source:'phone-web', location: loc})})
-    .then(r => st.textContent = r.ok ? 'Sent a chunk to the agent.' : 'Agent said no (' + r.status + ').')
-    .catch(() => st.textContent = 'Could not reach the agent.');
-}
-b.onclick = () => {
-  if (on) { on = false; rec.stop(); flush(true); b.textContent = 'Start listening'; b.className = ''; return; }
-  rec = new SR(); rec.continuous = true; rec.interimResults = true; rec.lang = 'en-US';
-  rec.onresult = e => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) { buf += t + '\n'; flush(false); } else interim += t;
-    }
-    live.textContent = (buf + interim).slice(-400);
-  };
-  rec.onend = () => { if (on) rec.start(); };
-  rec.start(); on = true; b.textContent = 'Stop and send'; b.className = 'stop';
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id)};
+var LS={
+  get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},
+  set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  del:function(k){try{localStorage.removeItem(k)}catch(e){}}
 };
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+/* ---------- session ---------- */
+function rid(){var c='abcdefghjkmnpqrstuvwxyz23456789',s='';var a=new Uint8Array(8);
+  (window.crypto||{getRandomValues:function(x){for(var i=0;i<x.length;i++)x[i]=Math.random()*256}}).getRandomValues(a);
+  for(var i=0;i<8;i++)s+=c[a[i]%c.length];return s}
+var session=LS.get('nx_session');
+function newSession(){session=rid();LS.set('nx_session',session);LS.set('nx_seq','0');LS.del('nx_queue');LS.del('nx_place')}
+function ensureSession(){if(!session){newSession()}}
+function getQueue(){try{return JSON.parse(LS.get('nx_queue')||'[]')}catch(e){return []}}
+function setQueue(q){LS.set('nx_queue',JSON.stringify(q))}
+function nextSeq(){var n=(parseInt(LS.get('nx_seq')||'0',10)||0)+1;LS.set('nx_seq',String(n));return n}
+
+/* ---------- screens ---------- */
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.toggle('on',s.id===id)});
+  window.scrollTo(0,0);
+}
+
+/* ---------- state ---------- */
+var listening=false, rec=null, buffer='', words=0, chunksSent=0, startedAt=0, timerH=null, flushH=null, watchH=null;
+var lastResultAt=0, restarts=[], restartH=null, wakeLock=null, audioEl=null, place=null, placeSent=false, flushing=false;
+var lines=[], interim='';
+
+function fmt(s){var m=Math.floor(s/60),x=s%60;return m+':'+(x<10?'0':'')+x}
+function setPill(text,good){var p=$('pill');if(!text){p.className='pill';p.textContent='';return}p.textContent=text;p.className='pill on'+(good?' good':'')}
+function setPaused(on){$('s-listen').classList.toggle('paused',on);$('state').textContent=on?'Paused':'Listening';
+  if(on)setPill('Paused. Say something or open this page again.');else if($('pill').textContent.indexOf('Paused')===0)setPill('')}
+
+function renderTx(){
+  var box=$('tx');box.textContent='';
+  var shown=lines.slice(-3);
+  if(!shown.length&&!interim){var p=document.createElement('p');p.className='empty';p.textContent='Say something. It shows up here.';box.appendChild(p);return}
+  var all=shown.slice(interim?-2:-3);
+  all.forEach(function(t){var p=document.createElement('p');p.textContent=t;box.appendChild(p)});
+  if(interim){var q=document.createElement('p');q.className='live';q.textContent=interim;box.appendChild(q)}
+}
+function renderCounts(){$('c-words').textContent=words;$('c-chunks').textContent=chunksSent;$('sent-note').textContent='Sent to the agent: '+chunksSent+' chunk'+(chunksSent===1?'':'s')}
+function countWords(t){return (t.trim().match(/\S+/g)||[]).length}
+
+/* ---------- sending ---------- */
+function moveBufferToQueue(){
+  var t=buffer.trim();buffer='';
+  if(!t)return;
+  var item={session:session,seq:nextSeq(),text:t};
+  if(place&&!placeSent){item.place=place;placeSent=true;LS.set('nx_place','sent')}
+  var q=getQueue();q.push(item);setQueue(q);
+}
+function postJSON(url,obj,keepalive,signal){
+  return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(obj),keepalive:!!keepalive,signal:signal})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()});
+}
+function drainQueue(){
+  if(flushing)return Promise.resolve();
+  flushing=true;
+  function step(){
+    var q=getQueue();
+    if(!q.length){flushing=false;return Promise.resolve()}
+    var item=q[0];
+    return postJSON('/api/listen/chunk',item,true).then(function(j){
+      if(!j||!j.ok)throw new Error('bad');
+      var q2=getQueue().filter(function(x){return !(x.session===item.session&&x.seq===item.seq)});
+      setQueue(q2);chunksSent++;renderCounts();return step();
+    });
+  }
+  return step().catch(function(){flushing=false});
+}
+function flush(){moveBufferToQueue();return drainQueue()}
+function beaconAll(){
+  moveBufferToQueue();
+  var q=getQueue();if(!q.length||!navigator.sendBeacon)return;
+  var rest=[];
+  q.forEach(function(item){
+    var ok=false;
+    try{ok=navigator.sendBeacon('/api/listen/chunk',new Blob([JSON.stringify(item)],{type:'application/json'}))}catch(e){}
+    if(!ok)rest.push(item);else chunksSent++;
+  });
+  setQueue(rest);
+}
+
+/* ---------- recognition ---------- */
+function startRec(){
+  if(!listening||!SR)return;
+  try{rec&&(rec.onend=rec.onerror=rec.onresult=null,rec.abort&&rec.abort())}catch(e){}
+  rec=new SR();rec.continuous=true;rec.interimResults=true;rec.lang='en-US';
+  rec.onresult=function(ev){
+    lastResultAt=Date.now();
+    if($('s-listen').classList.contains('paused'))setPaused(false);
+    var fin='',itm='';
+    for(var i=ev.resultIndex;i<ev.results.length;i++){
+      var r=ev.results[i],t=r[0].transcript;
+      if(r.isFinal)fin+=t+' ';else itm+=t;
+    }
+    interim=itm.trim();
+    if(fin.trim()){
+      var f=fin.trim();lines.push(f);if(lines.length>6)lines.shift();
+      buffer+=f+' ';words+=countWords(f);
+      if(buffer.length>400)flush();
+    }
+    renderTx();renderCounts();
+  };
+  rec.onerror=function(e){
+    if(e&&(e.error==='not-allowed'||e.error==='service-not-allowed')){
+      listening=false;stopTimers();
+      show('s-idle');showIdleError('The microphone is blocked. Allow it in your browser settings, then tap start again.');
+    }
+  };
+  rec.onend=function(){scheduleRestart()};
+  try{rec.start()}catch(e){scheduleRestart()}
+}
+function scheduleRestart(){
+  if(!listening)return;
+  var now=Date.now();restarts=restarts.filter(function(t){return now-t<10000});restarts.push(now);
+  var delay=restarts.length>5?2500:300;
+  clearTimeout(restartH);restartH=setTimeout(startRec,delay);
+}
+
+/* ---------- keep alive ---------- */
+function silentWav(){
+  var rate=8000,n=rate,buf=new Uint8Array(44+n);
+  function w32(o,v){buf[o]=v&255;buf[o+1]=v>>8&255;buf[o+2]=v>>16&255;buf[o+3]=v>>24&255}
+  function w16(o,v){buf[o]=v&255;buf[o+1]=v>>8&255}
+  function ws(o,s){for(var i=0;i<s.length;i++)buf[o+i]=s.charCodeAt(i)}
+  ws(0,'RIFF');w32(4,36+n);ws(8,'WAVE');ws(12,'fmt ');w32(16,16);w16(20,1);w16(22,1);w32(24,rate);w32(28,rate);w16(32,1);w16(34,8);ws(36,'data');w32(40,n);
+  for(var i=0;i<n;i++)buf[44+i]=128+((i%40<20)?1:-1);
+  var s='';for(var j=0;j<buf.length;j++)s+=String.fromCharCode(buf[j]);
+  return 'data:audio/wav;base64,'+btoa(s);
+}
+function startAudio(){
+  try{
+    if(!audioEl){audioEl=new Audio(silentWav());audioEl.loop=true;audioEl.volume=0.01}
+    var p=audioEl.play();if(p&&p.catch)p.catch(function(){});
+  }catch(e){}
+  try{
+    if('mediaSession' in navigator){
+      navigator.mediaSession.metadata=new MediaMetadata({title:'Networx is listening',artist:'Networx'});
+      navigator.mediaSession.playbackState='playing';
+    }
+  }catch(e){}
+}
+function stopAudio(){
+  try{audioEl&&audioEl.pause()}catch(e){}
+  try{if('mediaSession' in navigator)navigator.mediaSession.playbackState='none'}catch(e){}
+}
+function getWake(){
+  try{
+    if(navigator.wakeLock&&listening&&!wakeLock){
+      navigator.wakeLock.request('screen').then(function(l){wakeLock=l;l.addEventListener('release',function(){wakeLock=null})}).catch(function(){});
+    }
+  }catch(e){}
+}
+function dropWake(){try{wakeLock&&wakeLock.release()}catch(e){}wakeLock=null}
+function getPlace(){
+  if(!navigator.geolocation||LS.get('nx_place'))return;
+  try{navigator.geolocation.getCurrentPosition(function(p){
+    place=p.coords.latitude.toFixed(5)+','+p.coords.longitude.toFixed(5);
+  },function(){},{timeout:8000,maximumAge:600000})}catch(e){}
+}
+
+/* ---------- start / stop ---------- */
+function stopTimers(){clearInterval(timerH);clearInterval(flushH);clearInterval(watchH);clearTimeout(restartH);dropWake();stopAudio();
+  try{rec&&(rec.onend=rec.onerror=rec.onresult=null,rec.abort&&rec.abort())}catch(e){}}
+function startListening(resume){
+  hideIdleError();
+  if(!SR){show('s-unsupported');return}
+  ensureSession();
+  listening=true;buffer='';lines=[];interim='';words=resume?(parseInt(LS.get('nx_words')||'0',10)||0):0;chunksSent=0;
+  startedAt=Date.now();lastResultAt=Date.now();restarts=[];place=null;placeSent=!!LS.get('nx_place');
+  setPaused(false);setPill('');renderTx();renderCounts();$('timer').textContent='0:00';
+  show('s-listen');
+  startAudio();getWake();getPlace();startRec();
+  timerH=setInterval(function(){
+    $('timer').textContent=fmt(Math.floor((Date.now()-startedAt)/1000));
+    LS.set('nx_words',String(words));
+    if(document.visibilityState==='visible'&&Date.now()-lastResultAt>45000)setPaused(true);
+  },1000);
+  flushH=setInterval(flush,20000);
+  watchH=setInterval(function(){drainQueue()},5000);
+}
+function stopAndFinish(){
+  listening=false;stopTimers();
+  interim='';
+  show('s-proc');startProgress();
+  flush().then(finish);
+}
+
+/* ---------- finish / progress ---------- */
+var progH=null, finishCtl=null;
+function startProgress(){
+  $('proc-err').classList.add('hidden');$('b-retry').classList.add('hidden');$('bar').classList.remove('hidden');
+  var st=document.querySelectorAll('#proc .step'),i=0;
+  st.forEach(function(s){s.className='step'});st[0].classList.add('now');
+  clearInterval(progH);
+  progH=setInterval(function(){
+    if(i<st.length-1){st[i].className='step done';i++;st[i].classList.add('now')}
+  },9000);
+}
+function endProgress(){clearInterval(progH);document.querySelectorAll('#proc .step').forEach(function(s){s.className='step done'})}
+function finish(){
+  var ctl=window.AbortController?new AbortController():null;finishCtl=ctl;
+  var to=setTimeout(function(){ctl&&ctl.abort()},110000);
+  return drainQueue().then(function(){return postJSON('/api/listen/finish',{session:session},false,ctl&&ctl.signal)})
+  .then(function(j){
+    clearTimeout(to);
+    if(!j||!j.ok)throw new Error('The server could not finish this one.');
+    endProgress();renderResults(j);
+  }).catch(function(e){
+    clearTimeout(to);clearInterval(progH);
+    show('s-proc');
+    var msg=(e&&e.name==='AbortError')?'This is taking too long.':(e&&e.message)||'Something went wrong.';
+    $('proc-err').textContent=msg+' Nothing you said was lost. Tap try again.';
+    $('proc-err').classList.remove('hidden');$('b-retry').classList.remove('hidden');$('bar').classList.add('hidden');
+    document.querySelectorAll('#proc .step').forEach(function(s){s.className='step'});
+  });
+}
+
+/* ---------- results ---------- */
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function renderResults(j){
+  var s=j.summary||{};
+  $('r-people').textContent=s.people||0;$('r-prom').textContent=s.promises||0;
+  var tips=j.tips||[],tl=$('tips');tl.textContent='';
+  tips.forEach(function(t){tl.appendChild(el('li',null,t))});
+  $('tips-card').classList.toggle('hidden',!tips.length);
+  var box=$('steps');box.textContent='';
+  var ns=j.nextSteps||[];
+  $('no-steps').classList.toggle('hidden',ns.length>0);
+  ns.forEach(function(n){
+    var c=el('div','card');
+    var who=el('div','who');
+    who.appendChild(el('div','av',((n.person||'?').trim()[0]||'?').toUpperCase()));
+    var w=el('div');w.appendChild(el('b',null,n.person||'Someone'));w.appendChild(el('span','chan',n.channel||''));who.appendChild(w);
+    c.appendChild(who);
+    c.appendChild(el('p','what',n.what||''));
+    if(n.draft){
+      var d=el('div','draft');d.appendChild(el('span','label','Draft'));d.appendChild(document.createTextNode(n.draft));c.appendChild(d);
+      var b=el('button','copy','Copy');b.type='button';
+      b.addEventListener('click',function(){copyText(n.draft).then(function(){b.textContent='Copied';b.classList.add('ok');setTimeout(function(){b.textContent='Copy';b.classList.remove('ok')},1500)})});
+      c.appendChild(b);
+    }
+    if(n.research)c.appendChild(el('p','res',n.research));
+    box.appendChild(c);
+  });
+  show('s-res');
+}
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(t).catch(function(){return legacyCopy(t)})}
+  return legacyCopy(t);
+}
+function legacyCopy(t){
+  return new Promise(function(res){var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}document.body.removeChild(a);res()});
+}
+
+/* ---------- idle error ---------- */
+function showIdleError(m){var e=$('idle-err');if(!e){e=el('div','err');e.id='idle-err';e.setAttribute('role','alert');$('s-idle').insertBefore(e,$('b-start'))}e.textContent=m}
+function hideIdleError(){var e=$('idle-err');if(e)e.remove()}
+
+/* ---------- events ---------- */
+$('b-start').addEventListener('click',function(){newSession();startListening(false)});
+$('b-stop').addEventListener('click',stopAndFinish);
+$('b-retry').addEventListener('click',function(){startProgress();finish()});
+$('b-new').addEventListener('click',function(){newSession();LS.set('nx_words','0');show('s-idle')});
+$('b-resume-finish').addEventListener('click',function(){show('s-proc');startProgress();finish()});
+$('b-resume-keep').addEventListener('click',function(){startListening(true)});
+
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden'){
+    if(listening)beaconAll();
+  }else if(listening){
+    lastResultAt=Date.now();
+    getWake();startAudio();startRec();drainQueue();
+    setPaused(false);setPill('Welcome back, listening again',true);
+    setTimeout(function(){if($('pill').textContent.indexOf('Welcome')===0)setPill('')},4000);
+  }
+});
+window.addEventListener('pagehide',function(){if(listening)beaconAll()});
+
+/* ---------- load ---------- */
+function init(){
+  if(!SR){show('s-unsupported');return}
+  if(!session){show('s-idle');return}
+  fetch('/api/listen/result?session='+encodeURIComponent(session)).then(function(r){return r.json()}).then(function(j){
+    if(j&&j.ok&&j.nextSteps){renderResults(j)}
+    else if(j&&j.ok&&j.status==='collecting'){
+      $('resume-text').textContent='You have an unfinished session with '+(j.words||0).toLocaleString()+' words. Process it now?';
+      LS.set('nx_words',String(j.words||0));
+      show('s-resume');
+    }else show('s-idle');
+  }).catch(function(){show('s-idle')});
+}
+init();
+})();
 </script>
 </body>
 </html>

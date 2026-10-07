@@ -9,81 +9,86 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --base:#F3F5FA; --panel:#FFFFFF; --ink:#0B1020; --soft:#5B6580; --faint:#8D96AE;
-  --line:rgba(11,16,32,.09); --accent:#002FA7; --accent-soft:rgba(0,47,167,.08);
-  --ok:#0E7A4B; --warn:#B4540A;
+  --base:#F3F5FA; --panel:#FFFFFF; --ink:#0B1020; --soft:#4F5A76; --faint:#7C86A0;
+  --line:rgba(11,16,32,.09); --accent:#002FA7; --accent-soft:rgba(0,47,167,.08); --ok:#0E7A4B; --warn:#B4540A;
   --sans:Inter,system-ui,sans-serif; --head:Sora,Inter,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#9AA5C2;--faint:#6B7694;--line:rgba(238,241,250,.10);--accent:#6C8BFF;--accent-soft:rgba(108,139,255,.12);--ok:#3FCB8B;--warn:#F0A25C}
+  :root:not([data-theme="light"]){--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#A3AEC9;--faint:#76819F;--line:rgba(238,241,250,.10);--accent:#7F9BFF;--accent-soft:rgba(127,155,255,.13);--ok:#3FCB8B;--warn:#F0A25C}
 }
-:root[data-theme="dark"]{--base:#0A0E1A;--panel:#111729;--ink:#EEF1FA;--soft:#9AA5C2;--faint:#6B7694;--line:rgba(238,241,250,.10);--accent:#6C8BFF;--accent-soft:rgba(108,139,255,.12);--ok:#3FCB8B;--warn:#F0A25C}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{background:var(--base);color:var(--ink);font:400 15px/1.45 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
-.app{height:100vh;display:grid;grid-template-rows:auto 1fr auto;padding:20px 24px 14px;gap:16px}
+.app{height:100vh;display:grid;grid-template-rows:auto auto 1fr auto;padding:18px 24px 12px;gap:12px}
 
-/* top bar */
 .top{display:flex;align-items:center;gap:18px}
-.brand{font:600 17px var(--head);letter-spacing:-.01em}
-.brand i{font-style:normal;color:var(--accent)}
+.brand{font:600 17px var(--head);letter-spacing:-.01em}.brand i{font-style:normal;color:var(--accent)}
 .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font:500 13px var(--sans);color:var(--soft)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
-.live .dot{background:var(--accent);animation:pulse 1.6s ease-in-out infinite}
-.done .dot{background:var(--ok)}
-.err .dot{background:var(--warn)}
+.live .dot{background:var(--accent);animation:pulse 1.6s ease-in-out infinite}.done .dot{background:var(--ok)}.err .dot{background:var(--warn)}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,47,167,.35)}50%{box-shadow:0 0 0 6px rgba(0,47,167,0)}}
 .sp{flex:1}
-.stats{display:flex;gap:26px}
-.stat{display:flex;flex-direction:column;align-items:flex-start}
-.stat b{font:600 22px var(--head);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.stat span{font-size:12px;color:var(--faint)}
+.stats{display:flex;gap:24px}.stat b{font:600 21px var(--head);letter-spacing:-.02em;display:block;font-variant-numeric:tabular-nums}.stat span{font-size:12px;color:var(--faint)}
 button.run{font:500 13px var(--sans);color:#fff;background:var(--accent);border:0;border-radius:10px;padding:9px 16px;cursor:pointer;transition:opacity .15s}
-button.run:hover{opacity:.9} button.run:disabled{opacity:.45;cursor:default}
-button.run:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.run:hover{opacity:.9}button.run:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-/* three panes */
-.grid{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.7fr) minmax(250px,.9fr);gap:16px;min-height:0}
+.ctx{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:14px;color:var(--soft);min-height:44px}
+.ctx b{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.ctx.on{color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:minmax(240px,1fr) minmax(0,1.25fr) minmax(260px,1fr);gap:14px;min-height:0}
 .pane{background:var(--panel);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
-.ph{padding:14px 18px 10px;display:flex;align-items:baseline;justify-content:space-between}
+.ph{padding:14px 18px 8px;display:flex;align-items:baseline;justify-content:space-between}
 .ph h2{font:600 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-.ph small{font:400 12px var(--mono);color:var(--faint)}
-.body{padding:2px 18px 16px;overflow:hidden;flex:1;display:flex;flex-direction:column;gap:10px}
-
-/* hears */
-.line{font:400 13px/1.45 var(--mono);color:var(--soft);padding-left:12px;border-left:2px solid var(--line);animation:in .2s ease-out both}
-.line.hit{color:var(--ink);border-left-color:var(--accent)}
-.hears .body{justify-content:flex-end}
-.empty{color:var(--faint);font-size:14px;margin:auto;text-align:center;max-width:26ch}
-
-/* agent cards */
-.cards{overflow:auto;gap:12px}
-.card{border:1px solid var(--line);border-radius:14px;padding:14px 16px;animation:in .2s ease-out both}
-.card .who{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.av{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:600 12px var(--head)}
-.who b{font:600 14px var(--head)} .who span{font-size:12px;color:var(--faint)}
-.what{font-size:15px;color:var(--ink);margin-bottom:12px}
-.rail{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.step{font-size:12px;color:var(--faint);padding-top:8px;position:relative}
-.step::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:2px;background:var(--line);transition:background .2s}
-.step.on{color:var(--ink)} .step.on::before{background:var(--accent)}
-.step.now::before{background:linear-gradient(90deg,var(--accent),var(--accent-soft),var(--accent));background-size:200% 100%;animation:slide 1.2s linear infinite}
-@keyframes slide{from{background-position:200% 0}to{background-position:0 0}}
-.draft{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:13.5px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.draft em{font-style:normal;font:500 11px var(--mono);color:var(--accent);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em}
-.found{margin-top:8px;font-size:12.5px;color:var(--soft)}
-
-/* phone */
-.phone .body{background:var(--base);margin:0 14px 14px;border-radius:12px;padding:12px;gap:8px;overflow:auto;flex:1}
-.msg{background:var(--panel);border:1px solid var(--line);border-radius:12px 12px 12px 4px;padding:10px 12px;font-size:13px;animation:in .2s ease-out both}
-.msg b{display:block;font:500 11px var(--mono);color:var(--ok);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
-.msg.recap b{color:var(--accent)}
-.msg p{color:var(--ink);white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.ph small{font:400 11px var(--mono);color:var(--faint)}
+.body{padding:2px 16px 14px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:9px}
+.empty{color:var(--faint);font-size:14px;margin:auto;text-align:center;max-width:28ch}
 @keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-.foot{display:flex;justify-content:space-between;font-size:12.5px;color:var(--faint)}
+/* what was said */
+.say{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:8px 10px;border-radius:10px;animation:in .2s ease-out both;transition:background .15s}
+.say .n{font:400 11px var(--mono);color:var(--faint);padding-top:3px}
+.say .who{font:600 12.5px var(--head);display:block;margin-bottom:1px}
+.say .who i{font-style:normal;font:400 12px var(--sans);color:var(--faint)}
+.say.me .who{color:var(--accent)}
+.say .t{font-size:14px;color:var(--ink)}
+.say.hot{background:var(--accent-soft)}
+
+/* caught */
+.people{display:flex;flex-wrap:wrap;gap:8px}
+.person{display:flex;align-items:center;gap:10px;background:var(--base);border-radius:12px;padding:8px 12px;animation:in .2s ease-out both}
+.av{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:600 12px var(--head)}
+.person b{font:600 14px var(--head);display:block}.person span{font-size:12.5px;color:var(--soft)}
+.card{border:1px solid var(--line);border-radius:14px;padding:12px 14px;animation:in .2s ease-out both}
+.row1{display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.tag{font:500 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:3px 7px}
+.owes{font-size:12px;color:var(--faint)}
+.what{font-size:15px;margin-bottom:6px}
+.quote{font-size:13px;color:var(--soft);border-left:2px solid var(--line);padding-left:10px;margin-bottom:8px;cursor:pointer}
+.quote u{text-decoration:none;font:400 11px var(--mono);color:var(--accent);margin-left:6px}
+.ask{font-size:13px;color:var(--soft);margin-bottom:6px}
+.rail{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.step{font-size:11.5px;color:var(--faint);padding-top:7px;position:relative}
+.step::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:2px;background:var(--line);transition:background .2s}
+.step.on{color:var(--ink)}.step.on::before{background:var(--accent)}
+.step.now::before{background:linear-gradient(90deg,var(--accent),var(--accent-soft),var(--accent));background-size:200% 100%;animation:slide 1.2s linear infinite}
+@keyframes slide{from{background-position:200% 0}to{background-position:0 0}}
+
+/* ready to send */
+.draft{border:1px solid var(--line);border-radius:14px;padding:12px 14px;animation:in .2s ease-out both}
+.draft .meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.draft .meta span{font-size:12.5px;color:var(--soft)}
+.draft pre{font:400 13.5px/1.5 var(--sans);white-space:pre-wrap;color:var(--ink);margin-bottom:10px;max-height:150px;overflow:auto}
+.act{display:flex;gap:8px;align-items:center}
+.btn{font:500 13px var(--sans);border:0;border-radius:9px;padding:8px 14px;cursor:pointer;background:var(--accent);color:#fff;transition:opacity .15s}
+.btn:hover{opacity:.9}.btn.done{background:var(--ok);cursor:default}
+.note{font-size:11.5px;color:var(--faint)}
+
+.foot{display:flex;justify-content:space-between;gap:16px;font-size:12.5px;color:var(--faint)}
 .foot b{color:var(--ink);font-weight:500}
-@media (max-width:900px){body{overflow:auto}.app{height:auto}.grid{grid-template-columns:1fr}.pane{min-height:240px}.stats{display:none}}
+.left{color:var(--ok);font-weight:500}
+@media (max-width:1000px){body{overflow:auto}.app{height:auto}.grid{grid-template-columns:1fr}.pane{min-height:260px}.stats{display:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -92,7 +97,6 @@ button.run:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <div class="top">
     <div class="brand">Networ<i>x</i></div>
     <div class="chip" id="chip"><span class="dot"></span><span id="phase">Idle</span></div>
-    <div class="chip" id="place" style="display:none"></div>
     <div class="sp"></div>
     <div class="stats">
       <div class="stat"><b id="s-people">0</b><span>people met</span></div>
@@ -103,128 +107,146 @@ button.run:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     <button class="run" id="run">Replay sample</button>
   </div>
 
+  <div class="ctx" id="ctx"><b>Event</b><span>Waiting for your location and today's RSVPs.</span></div>
+
   <div class="grid">
-    <section class="pane hears">
-      <div class="ph"><h2>It hears</h2><small id="src">bee</small></div>
-      <div class="body" id="hears"><div class="empty">Waiting for someone to say "I'll send you that".</div></div>
-    </section>
-
     <section class="pane">
-      <div class="ph"><h2>It does</h2><small>agent37 box</small></div>
-      <div class="body cards" id="cards"><div class="empty">Promises show up here and get worked one by one.</div></div>
+      <div class="ph"><h2>What was said</h2><small>scripted sample</small></div>
+      <div class="body" id="said"><div class="empty">The conversation shows up here, line by line, with who said it.</div></div>
     </section>
-
-    <section class="pane phone">
-      <div class="ph"><h2 id="phtitle">Ready to send</h2><small id="chan">on screen</small></div>
-      <div class="body" id="phone"><div class="empty">Drafts land here. You tap and send.</div></div>
+    <section class="pane">
+      <div class="ph"><h2>What Networx caught</h2><small>agent37 box</small></div>
+      <div class="body" id="caught"><div class="empty">People you met and what you promised show up here, with the line they came from.</div></div>
+    </section>
+    <section class="pane">
+      <div class="ph"><h2>Ready to send</h2><small id="chan">on screen</small></div>
+      <div class="body" id="ready"><div class="empty">Finished drafts land here. You tap to send.</div></div>
     </section>
   </div>
 
-  <div class="foot"><span><b>Drafts only.</b> Nothing goes to anyone but you.</span><span id="recap"></span></div>
+  <div class="foot"><span id="foot-l"><b>Drafts only.</b> Nothing is sent until you tap. Names and companies in this sample are made up.</span><span id="foot-r"></span></div>
 </div>
 
 <script>
 const $ = id => document.getElementById(id);
 const API = (location.protocol === 'file:' ? 'http://localhost:8790' : '') + '/api';
-const PHASES = {idle:'Idle', listening:'Listening', catching:'Catching promises', working:'Working on them', recap:'Box timer sending recap', done:'Done', error:'Needs a look'};
-const seen = {hears:0, phone:new Set()};
+const PHASES = {idle:'Idle', listening:'Listening', catching:'Catching promises', working:'Working on them', recap:'Writing your briefing', done:'Done', error:'Needs a look'};
+const LIVE = ['listening','catching','working','recap'];
+const TYPE = {email:'Email', intro:'Intro', calendar:'Calendar invite'};
+const seen = {said:0, people:new Set()};
+const confirmed = new Set();
 let startedAt = null, lastState = null, lastRun = undefined;
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function clearAll(){
+  ['said','caught','ready'].forEach(k => $(k).innerHTML = '');
+  seen.said = 0; seen.people.clear(); confirmed.clear();
+  $('foot-r').textContent = ''; $('ctx').className = 'ctx'; $('ctx').innerHTML = '<b>Event</b><span>Waiting for your location and today\'s RSVPs.</span>';
+}
 
 async function tick(){
   let s;
   try { s = await (await fetch(API + '/state')).json(); } catch(e){ return; }
   lastState = s;
-  if (s.started !== lastRun) {          // a new run began (button, hotkey or a device): start from a clean screen
-    if (lastRun !== undefined || !s.started) { $('phone').innerHTML = ''; $('cards').innerHTML = ''; $('hears').innerHTML = ''; seen.hears = 0; seen.phone.clear(); }
-    lastRun = s.started;
-  }
-  const live = ['listening','catching','working','recap'].includes(s.phase);
+  if (s.started !== lastRun) { if (lastRun !== undefined || !s.started) clearAll(); lastRun = s.started; }
+  const live = LIVE.includes(s.phase);
   $('chip').className = 'chip ' + (live ? 'live' : s.phase === 'done' ? 'done' : s.phase === 'error' ? 'err' : '');
   $('phase').textContent = PHASES[s.phase] || s.phase;
-  { const o = (s.output || 'screen').split(',')[0].trim();
-    $('phtitle').textContent = o === 'screen' ? 'Ready to send' : 'Your phone';
-    $('chan').textContent = o === 'screen' ? 'on screen' : (s.output || o).replace(/,/g, ', '); }
-  $('place').style.display = s.place ? '' : 'none';
-  $('place').textContent = s.place || '';
   $('run').disabled = live;
-  $('src').textContent = s.source === 'bee-replay' ? 'bee band' : (s.source || 'bee band');
-  startedAt = s.started ? s.started : null;
-
+  startedAt = s.started || null;
+  $('chan').textContent = s.output === 'screen' ? 'on screen' : (s.output || 'on screen');
   const ready = s.promises.filter(p => ['ready','done'].includes(p.status)).length;
-  $('s-people').textContent = s.people.length;
-  $('s-prom').textContent = s.promises.length;
-  $('s-ready').textContent = ready;
+  $('s-people').textContent = s.people.length; $('s-prom').textContent = s.promises.length; $('s-ready').textContent = ready;
 
-  // hears
+  // event context
+  const ctx = s.events.find(e => e.kind === 'context');
+  if (ctx) { $('ctx').className = 'ctx on'; $('ctx').innerHTML = '<b>Event</b><span>' + esc(ctx.text) + '</span>'; }
+
+  // what was said
   const heard = s.events.filter(e => e.kind === 'heard');
-  const h = $('hears');
-  if (heard.length && seen.hears === 0) h.innerHTML = '';
-  if (!heard.length && seen.hears) { h.innerHTML = '<div class="empty">Waiting for someone to say "I\'ll send you that".</div>'; seen.hears = 0; }
-  heard.slice(seen.hears).forEach(e => {
-    const d = document.createElement('div');
-    d.className = 'line' + (/connect|linkedin|intro|call|send|deck|coffee/i.test(e.text) ? ' hit' : '');
-    d.textContent = e.text; h.appendChild(d);
-    while (h.children.length > 9) h.removeChild(h.firstChild);
+  const said = $('said');
+  if (heard.length && seen.said === 0) said.innerHTML = '';
+  heard.slice(seen.said).forEach((e, k) => {
+    const i = seen.said + k + 1;
+    const m = e.text.match(/^([^:()]+?)(?:\s*\(([^)]*)\))?:\s*(.*)$/);
+    const d = document.createElement('div'); d.id = 'l' + i;
+    if (m) {
+      const you = /you/i.test(m[2] || '');
+      d.className = 'say' + (you ? ' me' : '');
+      d.innerHTML = `<span class="n">${i}</span><div><span class="who">${esc(m[1])} <i>${you ? '(you)' : esc(m[2] ? '· ' + m[2] : '')}</i></span><span class="t">${esc(m[3])}</span></div>`;
+    } else {
+      d.className = 'say'; d.innerHTML = `<span class="n">${i}</span><div><span class="t">${esc(e.text)}</span></div>`;
+    }
+    said.appendChild(d); said.scrollTop = said.scrollHeight;
   });
-  seen.hears = heard.length;
+  seen.said = heard.length;
 
-  // cards
+  // caught: people then promises
+  const caught = $('caught');
+  if (s.people.length || s.promises.length) caught.querySelector('.empty')?.remove();
+  let pe = $('people');
+  if (s.people.length && !pe) { pe = document.createElement('div'); pe.className = 'people'; pe.id = 'people'; caught.prepend(pe); }
+  s.people.forEach(p => {
+    if (seen.people.has(p.name)) return; seen.people.add(p.name);
+    const d = document.createElement('div'); d.className = 'person';
+    d.innerHTML = `<div class="av">${esc(p.name[0])}</div><div><b>${esc(p.name)}</b><span>${esc([p.role, p.company].filter(Boolean).join(', ') || 'met at the event')}</span></div>`;
+    pe.appendChild(d);
+  });
   const kinds = {};
   s.events.forEach(e => { if (e.promise_id) (kinds[e.promise_id] = kinds[e.promise_id] || new Set()).add(e.kind); });
-  const cards = $('cards');
-  if (!s.promises.length) { if (!cards.querySelector('.empty')) cards.innerHTML = '<div class="empty">Promises show up here and get worked one by one.</div>'; }
-  else {
-    cards.querySelector('.empty')?.remove();
-    s.promises.forEach(p => {
-      let el = document.getElementById('c' + p.id);
-      if (!el) { el = document.createElement('div'); el.className = 'card'; el.id = 'c' + p.id; cards.appendChild(el); }
-      const k = kinds[p.id] || new Set(['promise']);
-      const lvl = k.has('sent') ? 4 : k.has('draft') ? 3 : k.has('box') ? 2 : 1;
-      const names = ['Caught', 'Box working', 'Draft ready', 'Ready to send'];
-      const rail = names.map((n,i) => `<div class="step ${i < lvl ? 'on' : ''} ${i === lvl - 0 && lvl < 4 ? 'now' : ''}">${n}</div>`).join('');
-      const owes = p.who_owes === 'me' ? 'you owe' : 'they owe';
-      const html = `<div class="who"><div class="av">${esc(p.person[0] || '?')}</div><b>${esc(p.person)}</b><span>${owes}</span></div>
-        <div class="what">${esc(p.what)}</div><div class="rail">${rail}</div>
-        ${p.draft ? `<div class="draft"><em>${esc(p.channel || 'draft')} draft, not sent</em>${esc(p.draft)}</div>` : ''}
-        ${p.research && lvl >= 3 ? `<div class="found">${esc(p.research)}</div>` : ''}`;
-      if (el.dataset.h !== html) { el.innerHTML = html; el.dataset.h = html; }
-    });
-  }
-
-  // phone
-  const ph = $('phone');
-  const sent = s.events.filter(e => e.kind === 'sent' && e.promise_id);
-  if (sent.length && ph.querySelector('.empty')) ph.innerHTML = '';
-  if (!sent.length && !s.recap && !ph.querySelector('.empty') && s.phase === 'idle') { ph.innerHTML = '<div class="empty">Drafts land here. You tap and send.</div>'; seen.phone.clear(); }
-  sent.forEach(e => {
-    if (seen.phone.has(e.id)) return; seen.phone.add(e.id);
-    const p = s.promises.find(x => x.id === e.promise_id) || {};
-    const d = document.createElement('div'); d.className = 'msg';
-    d.innerHTML = `<b>Ready, not sent · ${esc(e.person)}</b><p>${esc(p.draft || e.text)}</p>`;
-    ph.insertBefore(d, ph.firstChild);
+  s.promises.forEach(p => {
+    let el = document.getElementById('c' + p.id);
+    if (!el) { el = document.createElement('div'); el.className = 'card'; el.id = 'c' + p.id; caught.appendChild(el); }
+    const k = kinds[p.id] || new Set(['promise']);
+    const lvl = k.has('sent') ? 3 : k.has('draft') ? 2 : k.has('box') ? 1 : 0;
+    const names = ['Caught', 'Box working', 'Draft ready'];
+    const rail = names.map((n, i) => `<div class="step ${i <= (k.has('sent') ? 2 : lvl) ? 'on' : ''} ${i === lvl && lvl < 2 && !k.has('sent') ? 'now' : ''}">${n}</div>`).join('');
+    const html = `<div class="row1"><span class="tag">${TYPE[p.kind] || 'Follow-up'}</span><span class="owes">${p.who_owes === 'me' ? 'you promised' : 'they promised'} · ${esc(p.person)}</span></div>
+      <div class="what">${esc(p.what)}</div>
+      ${p.ask ? `<div class="ask">They asked for: ${esc(p.ask)}</div>` : ''}
+      ${p.quote ? `<div class="quote" data-line="${p.line || ''}">“${esc(p.quote)}”${p.line ? `<u>line ${p.line}</u>` : ''}</div>` : ''}
+      <div class="rail">${rail}</div>`;
+    if (el.dataset.h !== html) { el.innerHTML = html; el.dataset.h = html; }
   });
-  if (s.recap && s.phase === 'done' && !ph.querySelector('.recap') && s.recap.t > (s.started || 0)) {
-    const d = document.createElement('div'); d.className = 'msg recap';
-    d.innerHTML = `<b>Recap</b><p>${esc(s.recap.text)}</p>`; ph.insertBefore(d, ph.firstChild);
-  }
-  $('recap').textContent = s.recap ? ((s.output || 'screen') === 'screen' ? 'Last recap saved' : 'Recap sent by the box timer') : '';
+
+  // ready to send
+  const rd = $('ready');
+  const drafts = s.promises.filter(p => p.draft && ['ready','done'].includes(p.status));
+  if (drafts.length) rd.querySelector('.empty')?.remove();
+  drafts.forEach(p => {
+    let el = document.getElementById('d' + p.id);
+    if (el) return;
+    el = document.createElement('div'); el.className = 'draft'; el.id = 'd' + p.id;
+    const cal = p.kind === 'calendar';
+    el.innerHTML = `<div class="meta"><span class="tag">${esc(p.channel || 'Draft')}</span><span>${p.kind === "intro" ? "to the person you will introduce, about " : "to "}${esc(p.person)}</span></div><pre>${esc(p.draft)}</pre>
+      <div class="act"><button class="btn" data-id="${p.id}">${cal ? 'Confirm' : 'Send'}</button><span class="note">Sample: nothing leaves this screen.</span></div>`;
+    rd.appendChild(el);
+  });
+
+  // leave + briefing
+  const left = s.events.find(e => e.kind === 'left'), brief = s.events.find(e => e.kind === 'briefing');
+  $('foot-r').innerHTML = brief ? `<span class="left">You left the venue (sample) → ${esc(brief.text)}</span>` : (left ? '<span class="left">You left the venue (sample) → writing your briefing…</span>' : '');
 }
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('.btn');
+  if (b && !b.classList.contains('done')) { b.classList.add('done'); b.textContent = b.textContent === 'Confirm' ? 'Confirmed (sample)' : 'Sent (sample)'; return; }
+  const q = e.target.closest('.quote');
+  if (q && q.dataset.line) {
+    document.querySelectorAll('.say.hot').forEach(x => x.classList.remove('hot'));
+    const l = document.getElementById('l' + q.dataset.line);
+    if (l) { l.classList.add('hot'); l.scrollIntoView({block:'center', behavior:'smooth'}); }
+  }
+});
 
 function clock(){
-  if (!startedAt || !lastState) { return; }
-  const live = ['listening','catching','working','recap'].includes(lastState.phase);
-  const end = live ? Date.now()/1000 : (lastState.events.length ? lastState.events[lastState.events.length-1].t : startedAt);
-  const sec = Math.max(0, Math.round(end - startedAt));
+  if (!startedAt || !lastState) return;
+  const live = LIVE.includes(lastState.phase);
+  const last = lastState.events.length ? lastState.events[lastState.events.length-1].t : startedAt;
+  const sec = Math.max(0, Math.round((live ? Date.now()/1000 : last) - startedAt));
   $('s-time').textContent = Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0');
 }
-
-$('run').onclick = async () => {
-  $('run').disabled = true; seen.hears = 0; seen.phone.clear();
-  $('phone').innerHTML = ''; $('cards').innerHTML = ''; $('hears').innerHTML = '';
-  await fetch(API + '/run', {method:'POST'});
-};
+$('run').onclick = async () => { $('run').disabled = true; clearAll(); fetch(API + '/run', {method:'POST'}).catch(()=>{}); };
 setInterval(tick, 700); setInterval(clock, 500); tick();
 </script>
 </body>

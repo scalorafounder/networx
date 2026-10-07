@@ -1,43 +1,52 @@
-"""The whole agent in one call: text in, drafts on your phone.
+"""The whole agent in one call: text in, drafts out.
 Any device that can produce a transcript (Bee, Plaud, Pocket, Omi, a phone web page) calls process().
 """
 import os, re, time
 from concurrent.futures import ThreadPoolExecutor
 import catch, do
-from common import db, EVENT, log
+from common import db, event, set_event, log
 
-KEY = re.compile(r"connect|linkedin|intro|call|send|deck|coffee|email|meet", re.I)
+KEY = re.compile(r"connect|linkedin|intro|call|send|deck|coffee|email|meet|invite", re.I)
+SPEAKER = re.compile(r"^[A-Z][A-Za-z.' ]+( \([^)]*\))?:")
+
+
+def clean(l):
+    return re.sub(r"^\d\d:\d\d:\d\d ", "", l.strip())
 
 
 def heard(text, pace=0.0):
-    lines = [re.sub(r"^\d\d:\d\d:\d\d ", "", l.strip()) for l in text.splitlines() if l.strip()]
-    shown = [l for i, l in enumerate(lines) if KEY.search(l) or i % 9 == 0][:40]
+    lines = [clean(l) for l in text.splitlines() if l.strip()]
+    labeled = sum(1 for l in lines if SPEAKER.match(l)) >= max(2, len(lines) // 2)
+    shown = lines[:60] if labeled else [l for i, l in enumerate(lines) if KEY.search(l) or i % 9 == 0][:40]
     c = db()
     for l in shown:
-        log("heard", l[:220], c=c)
+        log("heard", l[:260], c=c)
         time.sleep(pace)
-    return len(lines)
+    return lines
 
 
-def process(text, source="api", pace=0.0, status=None, place=None):
+def process(text, source="api", pace=0.0, status=None, place=None, recap=True, context=None):
     st = status or (lambda s: None)
+    ev = event()
     st("listening")
-    n = heard(text, pace)
+    if context:
+        log("context", context, c=db())
+    lines = heard(text, pace)
     st("catching")
+    numbered = "\n".join(f"{i + 1}. {l}" for i, l in enumerate(lines))
     if place:
         os.environ["EVENT_PLACE"] = place   # do.py adds it to the draft prompt
-        text = "Where: " + place + "\n" + text
+        numbered = "Where: " + place + "\n" + numbered
     else:
         os.environ.pop("EVENT_PLACE", None)
-    data = catch.extract(text)
+    data = catch.extract(numbered)
     catch.save(data)
     st("working")
     c = db()
-    rows = c.execute("""select p.id,p.person,p.who_owes,p.what,p.by_when,p.quote,pe.company from event_agent.promises p
-        left join event_agent.people pe on pe.event=p.event and pe.name=p.person
-        where p.event=%s and p.status='open' order by p.id""", (EVENT,)).fetchall()
+    rows = c.execute(do.OPEN_ROWS + " order by p.id", (ev,)).fetchall()
 
     def one(r):
+        set_event(ev)
         try:
             do.run_one(db(), r)
         except Exception as e:
@@ -47,20 +56,24 @@ def process(text, source="api", pace=0.0, status=None, place=None):
 
     with ThreadPoolExecutor(4) as ex:
         list(ex.map(one, rows))
-    fire_recap(st)
+    if recap:
+        t_left = time.time()
+        log("left", "You left the venue (sample). Writing your briefing.", c=db())
+        fire_recap(st)
+        log("briefing", f"Briefing ready {round(time.time() - t_left)} seconds after you left.", c=db())
     st("done")
-    return {"lines": n, "people": len(data.get("people", [])), "promises": len(rows)}
+    return {"lines": len(lines), "people": len(data.get("people", [])), "promises": len(rows)}
 
 
 def reset():
     c = db()
     for t in ("events", "promises", "people"):
-        c.execute(f"delete from event_agent.{t} where event=%s", (EVENT,))
+        c.execute(f"delete from event_agent.{t} where event=%s", (event(),))
 
 
 def fire_recap(st):
     """Fire the 30 minute timer on the Agent37 box now and wait for its recap."""
-    import os, pathlib
+    import pathlib
     cron_id = os.environ.get("CRON_ID", "").strip()
     if not cron_id:
         f = pathlib.Path(__file__).with_name(".cron")
@@ -72,7 +85,7 @@ def fire_recap(st):
     before = c.execute("select count(*) from event_agent.runs where kind='recap'").fetchone()[0]
     st("recap")
     a37.run_cron(cron_id)
-    for _ in range(45):
+    for _ in range(18):
         time.sleep(2)
         if c.execute("select count(*) from event_agent.runs where kind='recap'").fetchone()[0] > before:
             break

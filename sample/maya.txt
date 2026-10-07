@@ -1,0 +1,12 @@
+00:00:04 Maya Chen (Partner, Northgate Ventures): Hi, I'm Maya. What are you building?
+00:00:09 Alex Rivera (you): An agent that listens at events and writes your follow-ups for you.
+00:00:16 Maya Chen (Partner, Northgate Ventures): Interesting. I'm looking for founders building developer tools for AI agents.
+00:00:23 Alex Rivera (you): I know one. Dev Patel runs Lumen. They build tracing tools for agents. I can introduce you.
+00:00:30 Maya Chen (Partner, Northgate Ventures): Please do. That is exactly the space I care about.
+00:00:38 Maya Chen (Partner, Northgate Ventures): Do you have a deck I can look at?
+00:00:43 Alex Rivera (you): Yes. I'll send you the deck tomorrow.
+00:00:48 Maya Chen (Partner, Northgate Ventures): Great. Send it to maya@northgate.example.
+00:00:55 Alex Rivera (you): Will do. Could we sit down properly next week?
+00:01:01 Maya Chen (Partner, Northgate Ventures): Yes, let's do a proper catch-up next week.
+00:01:06 Alex Rivera (you): I'll find a time and send you an invite.
+00:01:11 Maya Chen (Partner, Northgate Ventures): Perfect. Nice meeting you, Alex.

@@ -12,7 +12,7 @@ Full guide with every account you need, cost and time: [docs/INTEGRATE.md](docs/
 2. `cp .env.example .env` and fill in the keys (the file explains each one).
 3. `python setup.py` (makes the tables, the Agent37 box and the recap timer), then `python server.py`
 
-Open http://localhost:8790/agent. Press "Replay sample" to run `sample/charlie.txt`. It is a scripted, made-up chat between you and a fictional founder named Priya. Nobody real is in it.
+Open http://localhost:8790/agent. Press "Replay sample" to run `sample/maya.txt`. It is a scripted, made-up chat between you and a fictional investor named Maya Chen. Nobody real is in it.
 
 There is also a short deck at http://localhost:8790/deck/ . Press R on the deck to run the demo.
 
@@ -102,3 +102,9 @@ The safe way to share the database is a separate database role that can only rea
 ## License
 
 MIT
+
+## Deploy it to a public link (Vercel)
+`vercel --prod`, then add the same variables from `.env.example` in the Vercel project settings (set `OUTPUT=screen`). The deck is at `/deck/`, the demo at `/agent`, and the phone page at `/listen`.
+
+## Phone listening page (`/listen`)
+Tap start, keep networking, tap stop to get your next steps. It saves what it hears every 20 seconds, so a paused page loses nothing. Honest limit: browsers can pause a web page when the screen locks, iPhones most of all. A wearable (Bee, Plaud, Omi, Pocket) listens in the background and posts to `/api/ingest`. Audio is never stored by Networx. Only the transcript notes are kept. Note that the browser's own speech engine may send audio to its maker.

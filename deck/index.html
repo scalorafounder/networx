@@ -21,54 +21,57 @@
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 #deck{position:fixed;inset:0}
-.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:6vh 7vw;overflow:hidden}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:5vh 6vw;overflow:hidden}
 .slide.active{display:flex;animation:rise .2s ease-out}
 @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.kicker{font:500 clamp(.75rem,1vw,.9rem) var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1.4rem}
-h1{font:700 clamp(3rem,9vw,8rem)/.95 var(--head);letter-spacing:-.04em}
+.kicker{font:500 clamp(.8rem,1.05vw,1rem) var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem}
+h1{font:700 clamp(3rem,8vw,7rem)/.95 var(--head);letter-spacing:-.04em}
 h1 i{font-style:normal;color:var(--accent)}
-h2{font:600 clamp(1.8rem,4vw,3.4rem)/1.08 var(--head);letter-spacing:-.025em;max-width:22ch}
-.lede{font-size:clamp(1.1rem,1.9vw,1.6rem);color:var(--muted);max-width:44ch;margin-top:1.6rem;line-height:1.45}
-.big{font:600 clamp(1.4rem,2.6vw,2.3rem)/1.2 var(--head);letter-spacing:-.02em;max-width:26ch;margin-top:1.2rem}
+h2{font:600 clamp(1.9rem,3.6vw,3.2rem)/1.1 var(--head);letter-spacing:-.025em;max-width:26ch}
+.lede{font-size:clamp(1.15rem,1.9vw,1.6rem);color:var(--muted);max-width:44ch;margin-top:1.4rem;line-height:1.45}
 
-/* title */
-.title .tag{margin-top:2rem;font:600 clamp(1.3rem,2.8vw,2.4rem)/1.2 var(--head);letter-spacing:-.02em;max-width:24ch}
-.title .rule{width:64px;height:4px;background:var(--accent);border-radius:2px;margin:2rem 0 0}
+/* slide 1 */
+.pitch{font:600 clamp(1.6rem,3vw,2.7rem)/1.18 var(--head);letter-spacing:-.025em;max-width:30ch;margin-top:2.2vh}
+.sub{font:400 clamp(1.1rem,1.7vw,1.5rem) var(--sans);color:var(--muted);margin-top:1.4vh}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1rem,2vw,2rem);margin-top:5vh}
+.three div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.6rem}
+.three b{display:block;font:600 clamp(1.3rem,2.1vw,1.8rem)/1.2 var(--head);margin-bottom:.5rem;letter-spacing:-.01em}
+.three span{color:var(--muted);font-size:clamp(1rem,1.45vw,1.25rem);line-height:1.4}
+
+/* slide 2 flow */
+.nodes{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(1.2rem,2.2vw,2.4rem);margin-top:4vh}
+.node{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1rem 1rem;display:flex;flex-direction:column;gap:.5rem}
+.node:not(:last-child)::after{content:"";position:absolute;top:2.1rem;right:calc(-1 * clamp(1.2rem,2.2vw,2.4rem) + 3px);width:calc(clamp(1.2rem,2.2vw,2.4rem) - 6px);height:1px;background:var(--faint)}
+.node:not(:last-child)::before{content:"";position:absolute;top:calc(2.1rem - 3px);right:calc(-1 * clamp(1.2rem,2.2vw,2.4rem) + 3px);width:7px;height:7px;border-top:1px solid var(--faint);border-right:1px solid var(--faint);transform:rotate(45deg)}
+.num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--accent);color:#fff;font:500 1.05rem/2.2rem var(--mono);text-align:center}
+.node b{font:600 clamp(1.1rem,1.5vw,1.35rem)/1.2 var(--head);letter-spacing:-.01em}
+.node p{font:400 clamp(.9rem,1.1vw,1.02rem)/1.35 var(--sans);color:var(--muted)}
+.node small{margin-top:auto;font:400 .78rem var(--mono);color:var(--ok)}
+.node small.s{color:var(--faint)}
+.pillrow{margin-top:4vh}
+.pillrow span{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:99px;padding:.55rem 1.4rem;font:600 clamp(1.15rem,1.7vw,1.5rem) var(--head)}
+.support{font:400 clamp(1.05rem,1.55vw,1.35rem)/1.4 var(--sans);color:var(--ink);margin-top:2.2vh}
+.stack{font:400 clamp(.95rem,1.3vw,1.15rem)/1.45 var(--sans);color:var(--muted);margin-top:1vh}
+.priv{font:500 clamp(.95rem,1.3vw,1.15rem) var(--sans);color:var(--accent);margin-top:1vh}
 
 /* live */
 .live{padding:3vh 3vw}
 .frame{flex:1;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 20px 50px rgba(11,16,32,.10)}
 .frame iframe{width:100%;height:100%;border:0;display:block}
-.hint{margin-top:10px;text-align:center;font:400 12px var(--mono);color:var(--faint)}
+.hint{margin-top:10px;text-align:center;font:400 clamp(.85rem,1.1vw,1rem) var(--mono);color:var(--muted)}
 
-/* plug in */
-.flow{display:grid;grid-template-columns:1fr auto 1.15fr auto 1fr;gap:clamp(.8rem,2vw,2rem);align-items:center;margin-top:3vh;width:100%}
-.col h3{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
-.pill{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:8px;font:500 clamp(.9rem,1.3vw,1.1rem) var(--sans)}
-.pill small{font:400 11px var(--mono);color:var(--faint);white-space:nowrap}
-.pill.on small{color:var(--ok)}
-.arrow{font:400 2rem var(--head);color:var(--faint)}
-.core{background:var(--accent);color:#fff;border-radius:20px;padding:clamp(1.2rem,2.4vw,2.2rem)}
-.core b{font:700 clamp(1.5rem,2.6vw,2.4rem) var(--head);letter-spacing:-.02em;display:block;margin-bottom:.8rem}
-.core div{font-size:clamp(.9rem,1.25vw,1.1rem);line-height:1.5;padding:7px 0;border-top:1px solid rgba(255,255,255,.22)}
-.core div:first-of-type{border-top:0}
-.code{margin-top:3vh;background:#0B1020;color:#DCE4FF;border-radius:14px;padding:14px 18px;font:400 clamp(.78rem,1.15vw,1rem)/1.6 var(--mono);overflow:hidden;white-space:pre}
-.code span{color:#8FA8FF}
-
-/* every event */
-.three{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1rem,2vw,2rem);margin-top:4vh}
-.three div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.5rem}
-.three b{display:block;font:600 clamp(1.1rem,1.8vw,1.5rem) var(--head);margin-bottom:.4rem;letter-spacing:-.01em}
-.three span{color:var(--muted);font-size:clamp(.9rem,1.2vw,1.05rem)}
-
-/* clone */
-.clone{display:grid;grid-template-columns:1.2fr .8fr;gap:5vw;align-items:center}
-.qr{background:#fff;border-radius:20px;padding:18px;box-shadow:0 20px 50px rgba(11,16,32,.12);justify-self:center}
-.qr img{display:block;width:min(34vh,28vw);height:auto}
+/* take it with you */
+.clone{display:grid;grid-template-columns:.9fr 1.3fr;gap:4vw;align-items:center}
 .steps{margin-top:2rem;display:grid;gap:10px}
-.steps div{display:flex;gap:14px;align-items:baseline;font-size:clamp(1rem,1.6vw,1.35rem)}
+.steps div{display:flex;gap:14px;align-items:baseline;font-size:clamp(1.05rem,1.55vw,1.35rem)}
 .steps b{font:500 .85em var(--mono);color:var(--accent);min-width:2ch}
-.url{font:500 clamp(1rem,1.6vw,1.4rem) var(--mono);color:var(--accent);margin-top:1.6rem}
+.facts{margin-top:1.6rem;display:grid;gap:.7rem;font-size:clamp(1.05rem,1.55vw,1.35rem);color:var(--muted);line-height:1.4;max-width:34ch}
+.qrs{display:grid;grid-template-columns:1fr 1fr;gap:2.2vw;align-items:stretch}
+.qrcard{background:#fff;color:#0B1020;border-radius:20px;padding:20px;box-shadow:0 20px 50px rgba(11,16,32,.12);display:flex;flex-direction:column;align-items:center;text-align:center}
+.qrcard img{display:block;width:min(42vh,22vw);height:auto}
+.qrcard b{font:700 clamp(1.4rem,2.1vw,1.9rem) var(--head);margin-top:12px;letter-spacing:-.02em}
+.qrcard .u{font:500 clamp(.8rem,1vw,.95rem) var(--mono);color:#002FA7;margin-top:6px}
+.qrcard p{font:400 clamp(.95rem,1.25vw,1.1rem)/1.35 var(--sans);color:#5B6580;margin-top:10px}
 
 /* chrome */
 #bar{position:fixed;left:0;top:0;height:3px;background:var(--accent);width:0;transition:width .2s;z-index:9}
@@ -78,7 +81,7 @@ h2{font:600 clamp(1.8rem,4vw,3.4rem)/1.08 var(--head);letter-spacing:-.025em;max
 #ovgrid{background:var(--card);border-radius:16px;padding:20px;display:grid;gap:6px;min-width:300px}
 .ovitem{display:flex;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:15px}
 .ovitem:hover{background:var(--accent-soft)} .ovitem b{font:500 12px var(--mono);color:var(--accent)}
-@media (max-width:800px){.flow{grid-template-columns:1fr}.arrow{display:none}.clone{grid-template-columns:1fr}.three{grid-template-columns:1fr}}
+@media (max-width:800px){.nodes{grid-template-columns:1fr}.node::before,.node::after{display:none}.clone,.qrs{grid-template-columns:1fr}.three{grid-template-columns:1fr}.slide{overflow:auto}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -86,78 +89,62 @@ h2{font:600 clamp(1.8rem,4vw,3.4rem)/1.08 var(--head);letter-spacing:-.025em;max
 <div id="bar"></div><div id="counter"></div>
 <div id="deck">
 
-  <!-- 1 -->
-  <section class="slide title">
+  <!-- 1 Problem -->
+  <section class="slide">
     <div class="kicker">Build an Agent · Agent37 · Tech Week</div>
     <h1>Networ<i>x</i></h1>
-    <div class="tag">Make the most of every event.</div>
-    <p class="lede">An agent that hears the promises you make while you network, and has every follow-up ready before you leave the room.</p>
-    <div class="rule"></div>
+    <p class="pitch">Your agent signed you up for 40 events. Ours makes sure you get something out of the ones you went to.</p>
+    <p class="sub">Make the most of every event.</p>
+    <div class="three">
+      <div><b>RSVPs overlap</b><span>Two events, same hour, same block.</span></div>
+      <div><b>Conversations blur by evening</b><span>Who said what, and what you promised.</span></div>
+      <div><b>Follow-ups never get sent</b><span>The warm moment passes.</span></div>
+    </div>
   </section>
 
-  <!-- 2 -->
+  <!-- 2 How it works -->
+  <section class="slide">
+    <div class="kicker">How it works</div>
+    <h2>It knows where you are, listens, and has the follow-ups ready when you leave.</h2>
+    <div class="nodes">
+      <div class="node"><span class="num">1</span><b>Reads today's RSVPs</b><p>From your calendar.</p><small class="s">sample data today</small></div>
+      <div class="node"><span class="num">2</span><b>Detects the event you arrived at</b><p>Phone location. Closest venue wins, then the event in progress, else one tap to confirm.</p><small class="s">sample data today</small></div>
+      <div class="node"><span class="num">3</span><b>Listens</b><p>Wristband or phone.</p><small>working today</small></div>
+      <div class="node"><span class="num">4</span><b>Catches who you met and what you promised</b><p>One note per person.</p><small>working today</small></div>
+      <div class="node"><span class="num">5</span><b>Notices you left the venue</b><p>Sample location in the demo.</p><small>working today (sample)</small></div>
+      <div class="node"><span class="num">6</span><b>Briefing ready</b><p>One follow-up per person.</p><small>working today</small></div>
+    </div>
+    <div class="pillrow"><span>It only ever drafts. You tap send.</span></div>
+    <p class="support">Works with the Bee wristband today. Other wearables plug into one endpoint.</p>
+    <p class="stack">Built on Agent37 Cloud (one agent box per attendee) and Supabase. Telegram is an optional output.</p>
+    <p class="priv">Networx keeps notes, not audio.</p>
+  </section>
+
+  <!-- 3 Demo -->
   <section class="slide live">
     <div class="frame"><iframe id="agent" src="/agent" title="Networx live agent"></iframe></div>
-    <div class="hint">Live. A scripted sample conversation, real Agent37 box, real Supabase rows, drafts ready on screen. Press R to run it.</div>
+    <div class="hint">Scripted sample conversation. Names and companies are made up. Press R to run it.</div>
   </section>
 
-  <!-- 3 -->
-  <section class="slide">
-    <div class="kicker">Plug it into how you already work</div>
-    <h2>Any device in. Any chat app out.</h2>
-    <div class="flow">
-      <div class="col">
-        <h3>Listens through</h3>
-        <div class="pill on">Bee wristband <small>live today</small></div>
-        <div class="pill">Plaud <small>one POST</small></div>
-        <div class="pill">Pocket <small>one POST</small></div>
-        <div class="pill">Omi <small>one POST</small></div>
-        <div class="pill">Phone web page <small>no device</small></div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="core">
-        <b>Networx</b>
-        <div>Catches who you met and what you promised</div>
-        <div>Agent37 box does the work and writes the draft</div>
-        <div>Supabase remembers every person and promise</div>
-        <div>A timer re-checks and sends one recap</div>
-      </div>
-      <div class="arrow">→</div>
-      <div class="col">
-        <h3>Tells you on</h3>
-        <div class="pill on">Telegram <small>live today</small></div>
-        <div class="pill">WhatsApp <small>adapter ready</small></div>
-      </div>
-    </div>
-    <div class="code"><span>curl</span> -X POST https://your-networx/api/ingest -d '{"text":"I'll send you that deck on Friday","source":"plaud"}'</div>
-  </section>
-
-  <!-- 4 -->
-  <section class="slide">
-    <div class="kicker">Not just Tech Week</div>
-    <h2>Every room where you meet people.</h2>
-    <div class="three">
-      <div><b>Conferences</b><span>Twenty people met, twenty follow-ups, none forgotten.</span></div>
-      <div><b>Meetups and dinners</b><span>The "let's grab coffee" turns into a calendar hold.</span></div>
-      <div><b>Sales and fundraising</b><span>Every "send me the deck" gets sent while it is warm.</span></div>
-    </div>
-    <p class="lede">It only ever drafts. You tap send.</p>
-  </section>
-
-  <!-- 5 -->
+  <!-- 4 Take it with you -->
   <section class="slide">
     <div class="clone">
       <div>
-        <div class="kicker">Take it with you</div>
-        <h2>Scan, clone, plug in your device.</h2>
+        <h2>Take it with you.</h2>
+        <div class="facts">
+          <div>Time saved (est.): about 30 minutes per event, 5 events a day.</div>
+          <div>One Agent37 box per attendee. Works in every Tech Week city.</div>
+        </div>
         <div class="steps">
           <div><b>1</b>Clone the repo</div>
           <div><b>2</b>Add your Agent37, Supabase and chat keys</div>
           <div><b>3</b>Point your wristband or phone at /api/ingest</div>
         </div>
-        <div class="url">github.com/scalorafounder/networx</div>
       </div>
-      <div class="qr"><img src="qr-github.png" alt="QR code to the Networx GitHub repo"></div>
+      <div class="qrs">
+        <div class="qrcard"><img src="qr-github.png" alt="QR code to the Networx GitHub repo"><b>Clone it</b><span class="u">github.com/scalorafounder/networx</span></div>
+        <div class="qrcard"><img src="qr-demo.png" alt="QR code to try Networx today"><b>Try it today</b><span class="u">networx-one.vercel.app/listen</span><p>Tap start. Keep networking. Stop to get your next steps.</p></div>
+      </div>
     </div>
   </section>
 
@@ -184,7 +171,7 @@ h2{font:600 clamp(1.8rem,4vw,3.4rem)/1.08 var(--head);letter-spacing:-.025em;max
   }
   const next=()=>show(i+1),prev=()=>show(i-1);
   window.__deck={next,prev,show,n};
-  function runDemo(){ fetch('/api/run',{method:'POST'}).catch(()=>{}); show(1); }
+  function runDemo(){ fetch('/api/run',{method:'POST'}).catch(()=>{}); show(2); }
   document.addEventListener('keydown',e=>{
     if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;
     switch(e.key){
@@ -199,7 +186,7 @@ h2{font:600 clamp(1.8rem,4vw,3.4rem)/1.08 var(--head);letter-spacing:-.025em;max
   let x0=null;
   document.addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
   document.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50){dx<0?next():prev();}x0=null;},{passive:true});
-  const names=['Networx','Live demo','Plug it in','Every event','Clone it'];
+  const names=['Problem','How it works','Live demo','Take it with you'];
   slides.forEach((s,j)=>{const d=document.createElement('div');d.className='ovitem';
     d.innerHTML='<b>'+pad(j+1)+'</b><span>'+names[j]+'</span>';
     d.onclick=()=>{show(j);ov.classList.remove('open');};ovgrid.appendChild(d);});

@@ -4,6 +4,17 @@ import os
 from pathlib import Path
 
 EVENT = os.environ.get("EVENT_NAME", "My event")
+import threading
+_tl = threading.local()
+
+
+def set_event(name):
+    """Which event (or listening session) this thread is working on."""
+    _tl.event = name
+
+
+def event():
+    return getattr(_tl, "event", None) or EVENT
 
 
 def _dotenv():
@@ -43,4 +54,4 @@ def log(kind, text, promise_id=None, person=None, c=None):
     """One row in the live feed. The screen shows these as they happen."""
     c = c or db()
     c.execute("insert into event_agent.events(event,kind,promise_id,person,text) values(%s,%s,%s,%s,%s)",
-              (EVENT, kind, promise_id, person, text))
+              (event(), kind, promise_id, person, text))

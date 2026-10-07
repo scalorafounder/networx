@@ -3,20 +3,22 @@
     python catch.py <transcript.txt> [--from 14:03:00] [--to 14:20:00] [--dry]
 """
 import argparse, json, os, re, requests
-from common import env, db, EVENT, log
+from common import env, db, event, log
 
 MODEL = "gpt-5.2"
-SYSTEM = """You read a messy wristband transcript from a networking event. Speaker names are not labeled.
-The wearer is the person wearing the recorder. Return JSON only:
-{"people":[{"name":"","company":"","link":"","what_they_do":""}],
- "promises":[{"person":"","who_owes":"me|them","what":"","by_when":"","quote":""}]}
+SYSTEM = """You read a numbered transcript from a networking event. Lines may start with a speaker name.
+The wearer is the person marked (you), or the person wearing the recorder. Return JSON only:
+{"people":[{"name":"","company":"","role":"","what_they_do":""}],
+ "promises":[{"person":"","who_owes":"me|them","what":"","kind":"email|intro|calendar|other","ask":"","by_when":"","quote":"","line":0}]}
 Rules:
-- Only people clearly named and spoken to. Skip names you only half hear.
-- A promise is a real commitment: connect on LinkedIn, send something, make an intro, set a call, meet again.
-- "what" is one short action sentence. "quote" is the exact words from the transcript.
+- people: only people clearly named and spoken to (not people only mentioned). Use role and company only if said.
+- A promise is a real commitment: send something, make an intro, set a meeting, connect, meet again.
+- kind: email = the wearer will send material by email (a deck, a document). intro = the wearer will introduce them to a third person. calendar = a meeting or call will be set.
+- who_owes is me when the wearer must act, them when the other person must act.
+- ask = what the other person asked for or said they want, in a few words. Empty if none.
+- what is one short action sentence. quote is the exact words of the transcript line. line is that line's number.
 - by_when only if said, else "".
-- Never invent a link or company. Leave empty if not said.
-- The same promise said twice is one promise."""
+- Never invent a company, role, link or email. The same promise said twice is one promise."""
 
 
 def slice_lines(path, a, b):
@@ -66,21 +68,26 @@ def extract_openai(text):
 def save(data):
     c = db()
     for p in data.get("people", []):
-        c.execute("""insert into event_agent.people(event,name,company,link,what_they_do) values(%s,%s,%s,%s,%s)
+        c.execute("""insert into event_agent.people(event,name,company,link,what_they_do,role) values(%s,%s,%s,%s,%s,%s)
                      on conflict (event,name) do update set company=coalesce(nullif(excluded.company,''),event_agent.people.company),
                      link=coalesce(nullif(excluded.link,''),event_agent.people.link),
-                     what_they_do=coalesce(nullif(excluded.what_they_do,''),event_agent.people.what_they_do)""",
-                  (EVENT, p["name"], p.get("company"), p.get("link"), p.get("what_they_do")))
+                     what_they_do=coalesce(nullif(excluded.what_they_do,''),event_agent.people.what_they_do),
+                     role=coalesce(nullif(excluded.role,''),event_agent.people.role)""",
+                  (event(), p["name"], p.get("company"), p.get("link"), p.get("what_they_do"), p.get("role")))
     for p in data.get("people", []):
-        log("person", p.get("what_they_do") or "", person=p["name"], c=c)
+        log("person", " · ".join(x for x in (p.get("role"), p.get("company")) if x) or (p.get("what_they_do") or ""), person=p["name"], c=c)
     seen = []
+    seen_kind = []
     for q in data.get("promises", []):
-        words = set(re.findall(r"[a-z0-9]+", (q["person"] + " " + q["what"]).lower())) - {"the", "a", "to", "with", "on", "and", "of"}
-        if any(len(words & w) / max(1, min(len(words), len(w))) >= 0.6 for w in seen):
+        words = set(re.findall(r"[a-z0-9]+", q["what"].lower())) - {"the", "a", "to", "with", "on", "and", "of", "send", "for", "by", "in", "at", "will", "me", "my"}
+        if q.get("kind") in ("email", "intro", "calendar") and (q["person"], q["kind"]) in seen_kind:
+            continue          # one draft per kind per person is enough for a single conversation
+        if any(len(words & w) / max(1, min(len(words), len(w))) >= 0.75 for w in seen):
             continue          # same promise said twice
+        seen_kind.append((q["person"], q.get("kind")))
         seen.append(words)
-        pid = c.execute("insert into event_agent.promises(event,person,who_owes,what,by_when,quote) values(%s,%s,%s,%s,%s,%s) returning id",
-                        (EVENT, q["person"], q.get("who_owes", "me"), q["what"], q.get("by_when"), q.get("quote"))).fetchone()[0]
+        pid = c.execute("insert into event_agent.promises(event,person,who_owes,what,by_when,quote,line,kind,ask) values(%s,%s,%s,%s,%s,%s,%s,%s,%s) returning id",
+                        (event(), q["person"], q.get("who_owes", "me"), q["what"], q.get("by_when"), q.get("quote"), (int(q["line"]) if str(q.get("line") or "").isdigit() else None), q.get("kind"), q.get("ask"))).fetchone()[0]
         log("promise", q["what"], promise_id=pid, person=q["person"], c=c)
     c.execute("insert into event_agent.runs(kind,note) values('catch',%s)",
               (f"{len(data.get('people',[]))} people, {len(data.get('promises',[]))} promises",))
