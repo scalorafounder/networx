@@ -40,7 +40,7 @@ def process(text, source="api", pace=0.0, status=None, place=None, recap=True, c
     else:
         os.environ.pop("EVENT_PLACE", None)
     data = catch.extract(numbered)
-    catch.save(data)
+    catch.save(data, "\n".join(lines))
     st("working")
     c = db()
     rows = c.execute(do.OPEN_ROWS + " order by p.id", (ev,)).fetchall()

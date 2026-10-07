@@ -11,7 +11,7 @@ The wearer is the person marked (you), or the person wearing the recorder. Retur
 {"people":[{"name":"","company":"","role":"","what_they_do":""}],
  "promises":[{"person":"","who_owes":"me|them","what":"","kind":"email|intro|calendar|other","ask":"","by_when":"","quote":"","line":0}]}
 Rules:
-- people: only people clearly named and spoken to (not people only mentioned). Use role and company only if said.
+- people: only the OTHER people the wearer met. Never list the wearer (the (you) speaker) as a person met, and never use the wearer as a promise's person. The promise's person is the other person in the conversation (for an intro, the person who asked for it). Use role and company only if said.
 - A promise is a real commitment: send something, make an intro, set a meeting, connect, meet again.
 - kind: email = the wearer will send material by email (a deck, a document). intro = the wearer will introduce them to a third person. calendar = a meeting or call will be set.
 - who_owes is me when the wearer must act, them when the other person must act.
@@ -65,8 +65,16 @@ def extract_openai(text):
     return json.loads(r.json()["choices"][0]["message"]["content"])
 
 
-def save(data):
+def save(data, text=""):
     c = db()
+    m = re.search(r"([A-Z][A-Za-z.' ]+?)\s*\(you\)", text or "")
+    me = m.group(1).strip().lower() if m else None
+    if me:
+        data["people"] = [p for p in data.get("people", []) if p.get("name", "").strip().lower() != me]
+        others = [p["name"] for p in data["people"]]
+        for q in data.get("promises", []):
+            if q.get("person", "").strip().lower() == me and len(others) == 1:
+                q["person"] = others[0]      # the wearer cannot be the person met
     for p in data.get("people", []):
         c.execute("""insert into event_agent.people(event,name,company,link,what_they_do,role) values(%s,%s,%s,%s,%s,%s)
                      on conflict (event,name) do update set company=coalesce(nullif(excluded.company,''),event_agent.people.company),
