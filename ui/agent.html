@@ -115,7 +115,7 @@ button.run:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     </section>
 
     <section class="pane phone">
-      <div class="ph"><h2>Your phone</h2><small id="chan">telegram</small></div>
+      <div class="ph"><h2 id="phtitle">Ready to send</h2><small id="chan">on screen</small></div>
       <div class="body" id="phone"><div class="empty">Drafts land here. You tap and send.</div></div>
     </section>
   </div>
@@ -143,6 +143,9 @@ async function tick(){
   const live = ['listening','catching','working','recap'].includes(s.phase);
   $('chip').className = 'chip ' + (live ? 'live' : s.phase === 'done' ? 'done' : s.phase === 'error' ? 'err' : '');
   $('phase').textContent = PHASES[s.phase] || s.phase;
+  { const o = (s.output || 'screen').split(',')[0].trim();
+    $('phtitle').textContent = o === 'screen' ? 'Ready to send' : 'Your phone';
+    $('chan').textContent = o === 'screen' ? 'on screen' : (s.output || o).replace(/,/g, ', '); }
   $('place').style.display = s.place ? '' : 'none';
   $('place').textContent = s.place || '';
   $('run').disabled = live;
@@ -179,7 +182,7 @@ async function tick(){
       if (!el) { el = document.createElement('div'); el.className = 'card'; el.id = 'c' + p.id; cards.appendChild(el); }
       const k = kinds[p.id] || new Set(['promise']);
       const lvl = k.has('sent') ? 4 : k.has('draft') ? 3 : k.has('box') ? 2 : 1;
-      const names = ['Caught', 'Box working', 'Draft ready', 'On your phone'];
+      const names = ['Caught', 'Box working', 'Draft ready', 'Ready to send'];
       const rail = names.map((n,i) => `<div class="step ${i < lvl ? 'on' : ''} ${i === lvl - 0 && lvl < 4 ? 'now' : ''}">${n}</div>`).join('');
       const owes = p.who_owes === 'me' ? 'you owe' : 'they owe';
       const html = `<div class="who"><div class="av">${esc(p.person[0] || '?')}</div><b>${esc(p.person)}</b><span>${owes}</span></div>
@@ -206,7 +209,7 @@ async function tick(){
     const d = document.createElement('div'); d.className = 'msg recap';
     d.innerHTML = `<b>Recap</b><p>${esc(s.recap.text)}</p>`; ph.insertBefore(d, ph.firstChild);
   }
-  $('recap').textContent = s.recap ? 'Last recap sent to your phone' : '';
+  $('recap').textContent = s.recap ? ((s.output || 'screen') === 'screen' ? 'Last recap saved' : 'Recap sent by the box timer') : '';
 }
 
 function clock(){

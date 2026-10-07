@@ -1,6 +1,6 @@
 """CHECK LATER: runs on the Agent37 box on a timer. Re-checks open promises and
 sends one recap to the wearer: "You met N people. M promises. X ready, Y need you."
-Reads DATABASE_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID from the box env."""
+Reads DATABASE_URL and the OUTPUT settings from the box env. With OUTPUT=screen nothing is sent."""
 from common import db, EVENT
 from notify import send as telegram
 
@@ -14,4 +14,4 @@ msg = (f"Recap. You met {people} {'person' if people == 1 else 'people'}. {total
        "Nothing has been sent to anyone. Tap each draft to send it yourself.")
 mid = telegram(msg)
 c.execute("insert into event_agent.runs(kind,note) values('recap',%s)", (msg,))
-print("recap sent", mid)
+print("recap saved" if mid == "screen" else "recap sent", mid)

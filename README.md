@@ -2,7 +2,7 @@
 
 Networx listens to your event conversations and catches the promises you and others make.
 An Agent37 cloud box researches each one and writes a follow-up draft.
-Drafts are saved to Supabase and sent to your phone on Telegram. Nothing is ever sent to the other person.
+Drafts are saved to Supabase and shown on screen, and sent to a messaging app if you set one up (optional). Nothing is ever sent to the other person.
 
 ## Quickstart (3 steps)
 
@@ -16,7 +16,7 @@ Open http://localhost:8790/agent. Press "Replay sample" to run `sample/charlie.t
 
 There is also a short deck at http://localhost:8790/deck/ . Press R on the deck to run the demo.
 
-Input: text plus an optional place, sent to `POST /api/ingest`. Output: Telegram, WhatsApp, Slack or Discord. Docker files are included but untested.
+Input: text plus an optional place, sent to `POST /api/ingest`. Output: the screen (default, no messaging app needed), or Telegram, WhatsApp, Slack or Discord. Docker files are included but untested.
 
 ## What you need (env vars)
 
@@ -25,14 +25,14 @@ Input: text plus an optional place, sent to `POST /api/ingest`. Output: Telegram
 | AGENT37_API_KEY | yes | Your Agent37 API key |
 | AGENT37_INSTANCE | yes | The id of your Agent37 box (see below) |
 | DATABASE_URL | yes | Postgres link from Supabase |
-| TELEGRAM_BOT_TOKEN | yes | Token from @BotFather |
-| TELEGRAM_CHAT_ID | yes | Your chat id (message your bot, then check getUpdates) |
+| TELEGRAM_BOT_TOKEN | no | Token from @BotFather (only for Telegram) |
+| TELEGRAM_CHAT_ID | no | Your chat id (message your bot, then check getUpdates) |
 | OPENAI_API_KEY | no | If set, OpenAI reads the transcript. If not set, the Agent37 box does it. |
 | CONTEXT | no | A few lines about you, so the agent knows who is who. You can also put them in `context.txt`. |
 | CRON_ID | no | Id of an Agent37 timer that sends a recap. If empty, the recap step is skipped. |
 | EVENT_NAME | no | Label for this event |
 | INGEST_TOKEN | no | If set, `/api/ingest` needs header `X-Token` |
-| OUTPUT | no | `telegram` (default), `whatsapp`, `slack`, `discord`, or a comma list |
+| OUTPUT | no | `screen` (default if no messaging vars are set), `whatsapp`, `slack`, `discord`, or a comma list |
 | SLACK_WEBHOOK_URL, DISCORD_WEBHOOK_URL | only for those | Webhook links |
 | TWILIO_SID, TWILIO_TOKEN, WHATSAPP_FROM, WHATSAPP_TO | only for WhatsApp | Twilio details |
 
@@ -92,6 +92,12 @@ Phone web page: open `/listen` on your phone. You talk, it sends the transcript 
 
 Tested: Bee transcript replay, the Agent37 box, Supabase, Telegram.
 Not tested: Plaud, Pocket, Omi, WhatsApp, the `/listen` page in the background, running without an OpenAI key at scale.
+
+## Share one setup with a teammate
+
+A teammate can use the same Agent37 box and database. In their own `.env` they need the same AGENT37_API_KEY, AGENT37_INSTANCE, CRON_ID and DATABASE_URL. Share them privately (a password manager or a direct message), never in git. Then they run `python server.py`. They do not run `setup.py`.
+
+The safe way to share the database is a separate database role that can only read and write the `event_agent` schema. In the Supabase SQL editor create it, grant it usage on that schema and select, insert, update and delete on its tables, and give your teammate that role's connection string instead of your main password. This is a suggestion, not tested here.
 
 ## License
 

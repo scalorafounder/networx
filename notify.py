@@ -3,6 +3,7 @@
   telegram  needs TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID      TESTED
   whatsapp  needs TWILIO_SID, TWILIO_TOKEN, WHATSAPP_FROM, WHATSAPP_TO   written, NOT tested live
   slack     needs SLACK_WEBHOOK_URL (incoming webhook)       written, NOT tested live
+  screen    needs nothing. Drafts stay on the screen and in the database. This is the default when no messaging vars are set.
   discord   needs DISCORD_WEBHOOK_URL (channel webhook)      written, NOT tested live
 """
 import os
@@ -30,11 +31,31 @@ def discord(text):
     return "discord"
 
 
-CHANNELS = {"telegram": telegram, "whatsapp": whatsapp, "slack": slack, "discord": discord}
+def screen(text):
+    return "screen"
+
+
+def output():
+    """The chosen output, or the detected default: screen unless a messaging app is set up."""
+    o = os.environ.get("OUTPUT", "").strip().lower()
+    if o:
+        return o
+    if os.environ.get("TELEGRAM_BOT_TOKEN"):
+        return "telegram"
+    if os.environ.get("SLACK_WEBHOOK_URL"):
+        return "slack"
+    if os.environ.get("DISCORD_WEBHOOK_URL"):
+        return "discord"
+    if os.environ.get("TWILIO_SID"):
+        return "whatsapp"
+    return "screen"
+
+
+CHANNELS = {"screen": screen, "telegram": telegram, "whatsapp": whatsapp, "slack": slack, "discord": discord}
 
 
 def send(text):
-    names = [n.strip().lower() for n in os.environ.get("OUTPUT", "telegram").split(",") if n.strip()]
+    names = [n.strip() for n in output().split(",") if n.strip()]
     for n in names:
         if n not in CHANNELS:
             raise RuntimeError(f"OUTPUT has '{n}'. Use one or more of: {', '.join(CHANNELS)}")

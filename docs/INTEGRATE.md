@@ -3,7 +3,7 @@
 ## The contract
 
 - Input: text that was said, plus an optional place. Send it to `POST /api/ingest`.
-- Output: you pick a messaging app (Telegram, WhatsApp, Slack or Discord). Drafts show up there.
+- Output: drafts show on the screen by default, so the demo needs no messaging app. A messaging app (Telegram, WhatsApp, Slack or Discord) is optional.
 
 Nothing is ever sent to the other person. You get a draft and you tap send.
 
@@ -13,7 +13,7 @@ Nothing is ever sent to the other person. You get a draft and you tap send.
 |---|---|---|---|---|
 | Agent37 account and API key | agent37.com, then Dashboard, API keys | Paid credits. `setup.py` caps the box at 5 dollars of credit. Check their price page. | 5 min | No code |
 | Supabase project (the database) | supabase.com, New project. The free plan allows 2 projects. Copy the connection string from Project settings, Database. No command line needed: open the SQL editor, paste `schema.sql`, press Run. | Free tier | 10 min | Copy and paste |
-| A messaging app. Easiest is Telegram. | In Telegram, message @BotFather, send `/newbot`, follow the steps, copy the token. Then message your new bot once. Open `https://api.telegram.org/bot<TOKEN>/getUpdates` in a browser and copy the number after `"chat":{"id":`. | Free | 5 min | Copy and paste |
+| A messaging app (optional). Easiest is Telegram. | In Telegram, message @BotFather, send `/newbot`, follow the steps, copy the token. Then message your new bot once. Open `https://api.telegram.org/bot<TOKEN>/getUpdates` in a browser and copy the number after `"chat":{"id":`. | Free | 5 min | Copy and paste |
 | OpenAI key (optional) | platform.openai.com, API keys | Pay as you go, needs credit | 5 min | No code |
 | A place to run `server.py` | Your laptop works. Any small server also works (1 GB is enough). Or use Docker. | Free on a laptop | 10 min | Copy and paste |
 | A public address (only if your recorder is not on your own network) | A tunnel tool such as cloudflared or ngrok | Free tier | 10 min | Developer |
@@ -81,10 +81,17 @@ Set `OUTPUT` in `.env`. You can use more than one: `OUTPUT=telegram,slack`.
 
 | Platform | Set these | Status |
 |---|---|---|
+| Screen (default) | Nothing. Set `OUTPUT=screen` or leave it empty. Drafts show in the right pane and are saved in the database. | Works, nothing is sent |
 | Telegram | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Tested |
 | WhatsApp | Twilio account with the WhatsApp sandbox. `TWILIO_SID`, `TWILIO_TOKEN`, `WHATSAPP_FROM`, `WHATSAPP_TO` | Written, not tested |
 | Slack | Create an app, turn on Incoming Webhooks, add one to a channel. `SLACK_WEBHOOK_URL` | Written, not tested |
 | Discord | Channel settings, Integrations, Webhooks, New webhook, copy URL. `DISCORD_WEBHOOK_URL` | Written, not tested |
+
+## Share one setup with a teammate
+
+Your teammate can use the same Agent37 box and database. In their own `.env` they need the same AGENT37_API_KEY, AGENT37_INSTANCE, CRON_ID and DATABASE_URL. Share them privately (a password manager or a direct message). Never put them in git. Then they run `python server.py`. They do not run `setup.py`.
+
+The safe way to share the database is a separate role that can only read and write the `event_agent` schema. In the Supabase SQL editor, create a role, grant it usage on `event_agent` and select, insert, update and delete on its tables. Give your teammate that role's connection string, not your main password. Not tested here. Note that you both write to the same rows, so set a different EVENT_NAME each if you want separate demos.
 
 ## Troubleshooting
 

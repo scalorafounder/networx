@@ -41,7 +41,7 @@ def run_one(c, row):
     log("draft", d.get("draft") or "", promise_id=pid, person=person, c=c)
     mid = telegram(msg)
     c.execute("update event_agent.promises set status='ready', telegram_sent_at=now(), updated_at=now() where id=%s", (pid,))
-    log("sent", "Sent to your phone. Not sent to " + person + ".", promise_id=pid, person=person, c=c)
+    log("sent", ("Ready on screen. Not sent to " if mid == "screen" else "Sent to your phone. Not sent to ") + person + ".", promise_id=pid, person=person, c=c)
     print(f"promise {pid}: ready, telegram message {mid}")
 
 

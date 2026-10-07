@@ -21,7 +21,7 @@ REMOTE = "/home/node/event-agent"
 FILES = ["common.py", "recap.py", "notify.py"]
 PASS = ["DATABASE_URL", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "OUTPUT", "TWILIO_SID", "TWILIO_TOKEN",
         "WHATSAPP_FROM", "WHATSAPP_TO", "SLACK_WEBHOOK_URL", "DISCORD_WEBHOOK_URL", "EVENT_NAME"]
-NEED = {"telegram": ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"],
+NEED = {"screen": [], "telegram": ["TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID"],
         "whatsapp": ["TWILIO_SID", "TWILIO_TOKEN", "WHATSAPP_FROM", "WHATSAPP_TO"],
         "slack": ["SLACK_WEBHOOK_URL"], "discord": ["DISCORD_WEBHOOK_URL"]}
 
@@ -65,8 +65,10 @@ def teardown():
 
 
 def main():
-    env("AGENT37_API_KEY"); env("DATABASE_URL")
-    outs = [o.strip().lower() for o in os.environ.get("OUTPUT", "telegram").split(",") if o.strip()]
+    env("AGENT37_API_KEY"); env("DATABASE_URL")   # messaging vars are optional
+    outs = [o.strip().lower() for o in os.environ.get("OUTPUT", "").split(",") if o.strip()]
+    outs = outs or [__import__("notify").output()]
+    os.environ["OUTPUT"] = ",".join(outs)   # the box gets the same choice
     for o in outs:
         if o not in NEED:
             sys.exit(f"OUTPUT has '{o}'. Use one or more of: {', '.join(NEED)}")

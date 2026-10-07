@@ -81,7 +81,7 @@ def state():
     events = [dict(zip(("id", "kind", "promise_id", "person", "text", "t"), r)) for r in c.execute(
         "select id,kind,promise_id,person,text,extract(epoch from ts) from event_agent.events where event=%s order by id desc limit 80", (EVENT,)).fetchall()][::-1]
     recap = c.execute("select note,extract(epoch from created_at) from event_agent.runs where kind='recap' order by id desc limit 1").fetchone()
-    return {"phase": STATE["phase"], "started": STATE["started"], "source": STATE["source"], "error": STATE["error"], "place": STATE["place"],
+    return {"phase": STATE["phase"], "started": STATE["started"], "source": STATE["source"], "error": STATE["error"], "place": STATE["place"], "output": __import__("notify").output(),
             "now": time.time(), "people": people, "promises": promises, "events": events,
             "recap": {"text": recap[0], "t": recap[1]} if recap else None}
 
